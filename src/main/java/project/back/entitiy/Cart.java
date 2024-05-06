@@ -1,12 +1,6 @@
 package project.back.entitiy;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,5 +21,12 @@ public class Cart {
     @Column(name = "cart_id", nullable = false, unique = true)
     private Long cartId;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_id")
     private Member member;
+
+
+
+
 }

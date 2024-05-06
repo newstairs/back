@@ -1,12 +1,6 @@
 package project.back.entitiy;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,8 +24,15 @@ public class CartItem {
     @Column(name = "quantity")
     private Long quantity;
 
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="cart_id")
     private Cart cart;
 
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="product_id")
     private Product product;
 
 }

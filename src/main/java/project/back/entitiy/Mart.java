@@ -2,11 +2,10 @@ package project.back.entitiy;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
-public class mart {
+public class Mart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mart_id")

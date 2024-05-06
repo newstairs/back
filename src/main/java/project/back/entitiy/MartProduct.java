@@ -22,4 +22,19 @@ public class MartProduct {
 
     @Column(nullable = false)
     private Long price;
+
+
+    @ManyToOne(fetch =FetchType.LAZY)
+    @JoinColumn(name="product_id")
+    private Product product;
+
+
+    @ManyToOne(fetch =FetchType.LAZY)
+    @JoinColumn(name="mart_id")
+    private Mart mart;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="discount_id")
+    private Discount discount;
+
 }
