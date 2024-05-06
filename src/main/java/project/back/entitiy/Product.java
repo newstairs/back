@@ -20,4 +20,7 @@ public class Product {
     @Column(nullable = false)
     private String productName;
 
+    public Product(String productName) {
+        this.productName = productName;
+    }
 }
