@@ -7,6 +7,7 @@ import project.back.dto.MemberDto;
 import project.back.entitiy.Member;
 import project.back.repository.memberrepository.MemberRepositoryOther;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,8 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
     @Override
     public Long membersave(MemberDto m) {
         Member member=new Member(m.getEmail(),m.getUsername());
+        member.setCreate_time(LocalDateTime.now());
+
         em.persist(member);
         return member.getMember_id();
     }

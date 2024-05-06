@@ -45,7 +45,6 @@ public class JwtFilter extends GenericFilterBean {
 
             Long id=jwtUtill.getidfromtoken(token);
 
-            memberService.findmember(id);
 
             Authentication authentication= jwtUtill.getauth(token);
 

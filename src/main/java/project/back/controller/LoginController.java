@@ -1,6 +1,9 @@
 package project.back.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -25,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class LoginController {
 
@@ -50,6 +54,7 @@ public class LoginController {
 
 
     @GetMapping("/reqlogin")
+
     @ResponseBody
     public ResponseEntity<TokenSending> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
@@ -141,6 +146,18 @@ public class LoginController {
             return obj;
         }
 
+    }
+
+    @GetMapping("/test")
+    @ResponseBody
+    public String ans() throws JsonProcessingException {
+
+        MemberDto memberDto=new MemberDto("h","h");
+        Long id=memberService.memebersave(memberDto);
+
+        Optional<Member> mem=memberService.findmember(id);
+        log.info("만든시간:{}",mem.get().getCreate_time());
+        return "ok";
     }
 
 }

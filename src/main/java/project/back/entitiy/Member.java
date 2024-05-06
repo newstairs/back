@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 
 @Entity
 @Data
-public class Member {
+public class Member extends UpdateCreateTime{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,6 +19,10 @@ public class Member {
 
     @Column(name="name")
     private String name;
+
+
+    @Column(name="address")
+    private String address;
 
     public Member(String email, String name) {
         this.email = email;

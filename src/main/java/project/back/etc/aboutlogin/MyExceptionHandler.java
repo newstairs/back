@@ -49,7 +49,7 @@ public class MyExceptionHandler {
                 deloldtoken(accesstokenold);
 
 
-                resp.sendRedirect("/test/"+re_gen_token.getAccesstoken()+req.getRequestURI());
+                resp.       sendRedirect("/test/"+re_gen_token.getAccesstoken()+req.getRequestURI());
             }
             else{
                 throw new RefreshNullException();
