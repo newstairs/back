@@ -122,11 +122,11 @@ public class LoginController {
         if(member.isPresent()){
             Member m=member.get();
 
-            JwtToken jwtToken=jwtUtill.genjwt(username,m.getMember_id());
+            JwtToken jwtToken=jwtUtill.genjwt(username,m.getMemberId());
 
             List<Object> obj=new ArrayList<>();
             obj.add(jwtToken.getAccesstoken());
-            obj.add(m.getMember_id());
+            obj.add(m.getMemberId());
 
 
             return obj;

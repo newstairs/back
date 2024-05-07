@@ -40,6 +40,6 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
         member.setCreate_time(LocalDateTime.now());
 
         em.persist(member);
-        return member.getMember_id();
+        return member.getMemberId();
     }
 }
