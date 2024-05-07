@@ -1,8 +1,7 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.yaml.snakeyaml.tokens.FlowEntryToken;
 
 import java.math.BigDecimal;
 
