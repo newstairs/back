@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.MemberDto;
-import project.back.entitiy.Member;
+import project.back.entity.Member;
 import project.back.repository.memberrepository.MemberRepository;
 
 import java.util.Optional;

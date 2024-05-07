@@ -1,8 +1,7 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @Entity
 @Data
@@ -10,7 +9,7 @@ public class Member extends UpdateCreateTime{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long member_id;
+    private Long memberId;
 
 
     @Column(name="email")

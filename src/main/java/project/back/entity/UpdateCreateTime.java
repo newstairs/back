@@ -1,9 +1,8 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 

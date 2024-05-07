@@ -1,7 +1,6 @@
 package project.back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.back.dto.MemberDto;
-import project.back.entitiy.Member;
+import project.back.entity.Member;
 import project.back.etc.aboutlogin.Access_code;
 import project.back.etc.aboutlogin.JwtToken;
 import project.back.etc.aboutlogin.JwtUtill;
