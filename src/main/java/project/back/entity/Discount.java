@@ -21,4 +21,12 @@ public class Discount {
 
     @Column(precision = 3, scale = 1, nullable = false)
     private BigDecimal discountRate;
+
+    @OneToOne(mappedBy = "discount", fetch = FetchType.LAZY)
+    private MartProduct martProduct;
+
+    /* 더미 데이터 삽입에 사용 */
+    public Discount(BigDecimal discountRate) {
+        this.discountRate = discountRate;
+    }
 }

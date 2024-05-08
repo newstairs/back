@@ -20,6 +20,7 @@ public class Product {
     @Column(nullable = false)
     private String productName;
 
+    /* 더미 데이터 삽입에 사용 */
     public Product(String productName) {
         this.productName = productName;
     }
