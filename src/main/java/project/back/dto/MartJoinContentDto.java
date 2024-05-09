@@ -1,20 +1,15 @@
-package project.back.entitiy;
+package project.back.dto;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
-@Entity
 @Data
-public class Pharmacy {
-    @Id
+@RequiredArgsConstructor
+public class MartJoinContentDto {
     private String id;
-
     private String placeName;
     private String address;
     private String roadAddress;
@@ -22,7 +17,7 @@ public class Pharmacy {
     private String distance;
 
     @Builder
-    public Pharmacy( String id, String placeName, String address, String roadAddress, String phone, String distance) {
+    public MartJoinContentDto( String id, String placeName, String address, String roadAddress, String phone, String distance) {
         this.placeName = placeName;
         this.id=id;
         this.address = address;
