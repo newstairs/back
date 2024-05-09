@@ -53,7 +53,7 @@ public class DataInitializer implements CommandLineRunner {
                 new Mart("코스트코", "코스트코 주소"),
                 new Mart("하나로마트", "하나로마트 주소")
         );
-        //martRepository.saveAll(marts);
+        martRepository.saveAll(marts);
 
         /* 할인율 */
         List<Discount> discounts = Arrays.asList(
@@ -67,8 +67,7 @@ public class DataInitializer implements CommandLineRunner {
                 new Discount(BigDecimal.valueOf(20.5)),
                 new Discount(BigDecimal.valueOf(5.0))
         );
-        //discountRepository.saveAll(discounts);
-
+        discountRepository.saveAll(discounts);
 
         /* 마트별 품목 가격 및 할인율 */
         List<MartProduct> martProducts = Arrays.asList(
@@ -96,18 +95,18 @@ public class DataInitializer implements CommandLineRunner {
                 new MartProduct(30L, 4600L, products.get(3), marts.get(4), discounts.get(8)),
                 new MartProduct(20L, 1500L, products.get(6), marts.get(4), discounts.get(4))
         );
-        //martProductRepository.saveAll(martProducts);
+        martProductRepository.saveAll(martProducts);
 
         /* 회원 카트에 담긴 상품 목록 */
         Member userA = new Member("test@test.com", "회원A");
         memberRepository.save(userA);
 
         // 카트에 상품 추가
-       List<Cart> cartItems = Arrays.asList(
+        List<Cart> cartItems = Arrays.asList(
                 new Cart(2L, userA, products.get(1)),
                 new Cart(1L, userA, products.get(3)),
                 new Cart(5L, userA, products.get(6))
         );
-        //cartRepository.saveAll(cartItems);
+        cartRepository.saveAll(cartItems);
     }
 }
