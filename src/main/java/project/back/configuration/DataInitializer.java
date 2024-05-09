@@ -16,10 +16,10 @@ import java.util.List;
 public class DataInitializer implements CommandLineRunner {
 
     private final ProductRepository productRepository;
-   // private final MartRepository martRepository;
-    //private final MartProductRepository martProductRepository;
-    //private final DiscountRepository discountRepository;
-    //private final CartRepository cartRepository;
+    private final MartRepository martRepository;
+    private final MartProductRepository martProductRepository;
+    private final DiscountRepository discountRepository;
+    private final CartRepository cartRepository;
     private final MemberRepository memberRepository;
 
     @Override
@@ -45,14 +45,14 @@ public class DataInitializer implements CommandLineRunner {
         productRepository.saveAll(products);
 
         /* 주변 마트 목록 */
-        /*List<Mart> marts = Arrays.asList(
+        List<Mart> marts = Arrays.asList(
                 new Mart("이마트", "이마트 주소"),
                 new Mart("롯데마트", "롯데마트 주소"),
                 new Mart("하이마트", "하이마트 주소"),
                 new Mart("홈플러스", "홈플러스 주소"),
                 new Mart("코스트코", "코스트코 주소"),
                 new Mart("하나로마트", "하나로마트 주소")
-        );*/
+        );
         //martRepository.saveAll(marts);
 
         /* 할인율 */
@@ -71,7 +71,7 @@ public class DataInitializer implements CommandLineRunner {
 
 
         /* 마트별 품목 가격 및 할인율 */
-        /*List<MartProduct> martProducts = Arrays.asList(
+        List<MartProduct> martProducts = Arrays.asList(
                 // 마트 1
                 new MartProduct(50L, 1500L, products.get(1), marts.get(0), discounts.get(0)),
                 new MartProduct(20L, 4000L, products.get(3), marts.get(0), discounts.get(2)),
@@ -95,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
                 new MartProduct(40L, 1500L, products.get(1), marts.get(4), null),
                 new MartProduct(30L, 4600L, products.get(3), marts.get(4), discounts.get(8)),
                 new MartProduct(20L, 1500L, products.get(6), marts.get(4), discounts.get(4))
-        );*/
+        );
         //martProductRepository.saveAll(martProducts);
 
         /* 회원 카트에 담긴 상품 목록 */
@@ -103,11 +103,11 @@ public class DataInitializer implements CommandLineRunner {
         memberRepository.save(userA);
 
         // 카트에 상품 추가
-      /*  List<Cart> cartItems = Arrays.asList(
+       List<Cart> cartItems = Arrays.asList(
                 new Cart(2L, userA, products.get(1)),
                 new Cart(1L, userA, products.get(3)),
                 new Cart(5L, userA, products.get(6))
-        );*/
+        );
         //cartRepository.saveAll(cartItems);
     }
 }
