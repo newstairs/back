@@ -37,6 +37,7 @@ public class SecurityConfig {
                     authorize//.requestMatchers("/api1","/code/**","/mypage/**").hasRole("user")
                             //.requestMatchers("/login/**","/","/test/**","/reqlogin/**",tokenuri,userinfouri,"http://krmp-proxy.9rum.cc:3128/**","/logouts").permitAll()
                             .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                            .requestMatchers("/test").hasRole("user")
                             .anyRequest().permitAll();
 
                 })

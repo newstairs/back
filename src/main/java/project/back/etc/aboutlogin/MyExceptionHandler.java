@@ -10,9 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import project.back.dto.ApiResponse;
 import project.back.etc.aboutlogin.exception.RefreshNullException;
 
 import java.io.IOException;
@@ -32,8 +36,9 @@ public class MyExceptionHandler {
         this.jwtUtill=jwtUtill;
     }
 
+    @ResponseBody
     @ExceptionHandler(ExpiredJwtException.class)
-    public void ExprieJwt(HttpServletRequest req, HttpServletResponse resp, ExpiredJwtException e) throws IOException {
+    public ResponseEntity<ApiResponse<String>> ExprieJwt(HttpServletRequest req, HttpServletResponse resp, ExpiredJwtException e) throws IOException {
         log.info("access token 재발행 필요");
         String accesstokenold=req.getHeader("Authorization").substring(7);
 
@@ -48,8 +53,8 @@ public class MyExceptionHandler {
 
                 deloldtoken(accesstokenold);
 
-
-                resp.       sendRedirect("/test/"+re_gen_token.getAccesstoken()+req.getRequestURI());
+                return new ResponseEntity<>(ApiResponse.success(re_gen_token.getAccesstoken(),"토큰 재발급"),HttpStatus.OK);
+               // resp.sendRedirect("/test/"+re_gen_token.getAccesstoken()+req.getRequestURI());
             }
             else{
                 throw new RefreshNullException();
@@ -59,19 +64,19 @@ public class MyExceptionHandler {
         catch(RefreshNullException exception){
             log.info("리프래시 토큰 재발급 필요---->즉 재로그인 요망");
 
-            resp.sendRedirect("/test/no/login");
+            return new ResponseEntity<>(ApiResponse.fail("재로그인 필요"), HttpStatus.BAD_REQUEST);
         }
 
 
 
     }
 
-
+    @ResponseBody
     @ExceptionHandler({SecurityException.class, MalformedJwtException.class, UnsupportedJwtException.class, EtcError.class})
-    public void authexception(HttpServletRequest req,HttpServletResponse resp,Exception e)throws IOException{
+    public ResponseEntity<ApiResponse<String>> authexception(HttpServletRequest req,HttpServletResponse resp,Exception e)throws IOException{
 
         log.info("기타예외들 발생:{}, 에러발생한 uri:{}",e.getClass(),req.getRequestURI());
-        resp.sendRedirect("/test/no/home");
+        return new ResponseEntity<>(ApiResponse.fail("재로그인 필요"), HttpStatus.BAD_REQUEST);
 
     }
 
