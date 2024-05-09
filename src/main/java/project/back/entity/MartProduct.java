@@ -1,4 +1,4 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,18 +23,24 @@ public class MartProduct {
     @Column(nullable = false)
     private Long price;
 
-
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
-
 
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name="mart_id")
     private Mart mart;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name="discount_id")
     private Discount discount;
 
+    /* 더미 데이터 삽입에 사용 */
+    public MartProduct(Long stock, Long price, Product product, Mart mart, Discount discount) {
+        this.stock = stock;
+        this.price = price;
+        this.product = product;
+        this.mart = mart;
+        this.discount = discount;
+    }
 }

@@ -1,4 +1,4 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 
 @Entity
 @Getter
@@ -22,4 +21,12 @@ public class Discount {
 
     @Column(precision = 3, scale = 1, nullable = false)
     private BigDecimal discountRate;
+
+    @OneToOne(mappedBy = "discount", fetch = FetchType.LAZY)
+    private MartProduct martProduct;
+
+    /* 더미 데이터 삽입에 사용 */
+    public Discount(BigDecimal discountRate) {
+        this.discountRate = discountRate;
+    }
 }

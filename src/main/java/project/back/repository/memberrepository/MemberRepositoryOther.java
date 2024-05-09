@@ -1,7 +1,7 @@
 package project.back.repository.memberrepository;
 
 import project.back.dto.MemberDto;
-import project.back.entitiy.Member;
+import project.back.entity.Member;
 
 import java.util.Optional;
 

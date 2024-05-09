@@ -1,13 +1,16 @@
 package project.back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.Getter;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,12 +19,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import project.back.dto.ApiResponse;
 import project.back.dto.MemberDto;
-import project.back.entitiy.Member;
+import project.back.entity.Member;
 import project.back.etc.aboutlogin.Access_code;
 import project.back.etc.aboutlogin.JwtToken;
 import project.back.etc.aboutlogin.JwtUtill;
 import project.back.etc.aboutlogin.exception.TokenSending;
+import project.back.repository.memberrepository.MemberRepository;
 import project.back.service.memberservice.MemberService;
 
 import java.io.IOException;
@@ -37,6 +42,9 @@ public class LoginController {
     private final WebClient webClient;
     private final MemberService memberService;
 
+
+    @Autowired
+    private @Qualifier("redisTemplate") RedisTemplate<String,Object> redisTemplate;
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoclientid;
 
@@ -54,9 +62,8 @@ public class LoginController {
 
 
     @GetMapping("/reqlogin")
-
     @ResponseBody
-    public ResponseEntity<TokenSending> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
+    public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
         MultiValueMap<String, String> accessTokenParams = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
        MultiValueMap<String, String> accessTokenRequest = accessTokenParams;
@@ -104,8 +111,8 @@ public class LoginController {
         Optional<Member> member=memberService.finbdyemail(email);
 
         List<Object> tokendata=gettokenandresponse(email,userName,member);
-
-        return new ResponseEntity<>(new TokenSending((String) tokendata.get(0)), HttpStatus.OK);
+        ApiResponse.success((String)tokendata.get(0),"로그인 성공");
+        return new ResponseEntity<>( ApiResponse.success((String)tokendata.get(0),"로그인 성공"), HttpStatus.OK);
     }
 
 
@@ -123,11 +130,11 @@ public class LoginController {
         if(member.isPresent()){
             Member m=member.get();
 
-            JwtToken jwtToken=jwtUtill.genjwt(username,m.getMember_id());
+            JwtToken jwtToken=jwtUtill.genjwt(username,m.getMemberId());
 
             List<Object> obj=new ArrayList<>();
             obj.add(jwtToken.getAccesstoken());
-            obj.add(m.getMember_id());
+            obj.add(m.getMemberId());
 
 
             return obj;
@@ -148,17 +155,15 @@ public class LoginController {
 
     }
 
-    @GetMapping("/test")
+
+    @GetMapping("/logouts")
     @ResponseBody
-    public String ans() throws JsonProcessingException {
-
-        MemberDto memberDto=new MemberDto("h","h");
-        Long id=memberService.memebersave(memberDto);
-
-        Optional<Member> mem=memberService.findmember(id);
-        log.info("만든시간:{}",mem.get().getCreate_time());
-        return "ok";
+    public ResponseEntity<ApiResponse<String>> logoutans(HttpServletRequest req){
+        String token=req.getHeader("Authorization").substring(7);
+        redisTemplate.delete(token);
+        return new ResponseEntity<>(ApiResponse.success("null","로그아웃성공"),HttpStatus.OK);
     }
+
 
 }
 

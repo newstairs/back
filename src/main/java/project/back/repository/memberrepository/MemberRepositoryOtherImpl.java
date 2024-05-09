@@ -4,8 +4,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import project.back.dto.MemberDto;
-import project.back.entitiy.Member;
-import project.back.repository.memberrepository.MemberRepositoryOther;
+import project.back.entity.Member;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +40,6 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
         member.setCreate_time(LocalDateTime.now());
 
         em.persist(member);
-        return member.getMember_id();
+        return member.getMemberId();
     }
 }

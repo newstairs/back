@@ -1,4 +1,4 @@
-package project.back.entitiy;
+package project.back.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,19 +14,27 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_id", nullable = false, unique = true)
     private Long cartId;
 
+    @Column(name = "quantity")
+    private Long quantity;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="product_id")
+    private Product product;
 
-
-
+    /* 더미 데이터 삽입에 사용 */
+    public Cart(Long quantity, Member member, Product product) {
+        this.quantity = quantity;
+        this.member = member;
+        this.product = product;
+    }
 }
