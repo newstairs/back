@@ -30,4 +30,11 @@ public class Cart {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
+
+    /* 더미 데이터 삽입에 사용 */
+    public Cart(Long quantity, Member member, Product product) {
+        this.quantity = quantity;
+        this.member = member;
+        this.product = product;
+    }
 }
