@@ -57,15 +57,10 @@ public class DataInitializer implements CommandLineRunner {
 
         /* 할인율 */
         List<Discount> discounts = Arrays.asList(
-                new Discount(BigDecimal.valueOf(10.5)),
-                new Discount(BigDecimal.valueOf(15.0)),
-                new Discount(BigDecimal.valueOf(5.0)),
-                new Discount(BigDecimal.valueOf(20.5)),
-                new Discount(BigDecimal.valueOf(10.5)),
-                new Discount(BigDecimal.valueOf(15.0)),
-                new Discount(BigDecimal.valueOf(5.0)),
-                new Discount(BigDecimal.valueOf(20.5)),
-                new Discount(BigDecimal.valueOf(5.0))
+                new Discount(BigDecimal.valueOf(10.5)), // 0
+                new Discount(BigDecimal.valueOf(15.0)), // 1
+                new Discount(BigDecimal.valueOf(5.0)), // 2
+                new Discount(BigDecimal.valueOf(20.5)) // 3
         );
         discountRepository.saveAll(discounts);
 
@@ -80,21 +75,21 @@ public class DataInitializer implements CommandLineRunner {
                 // 마트 2
                 new MartProduct(20L, 1450L, products.get(1), marts.get(1), null),
                 new MartProduct(30L, 5000L, products.get(3), marts.get(1), discounts.get(3)),
-                new MartProduct(20L, 1400L, products.get(6), marts.get(1), discounts.get(5)),
+                new MartProduct(20L, 1400L, products.get(6), marts.get(1), discounts.get(1)),
 
                 // 마트 3
                 new MartProduct(30L, 1550L, products.get(1), marts.get(2), discounts.get(1)),
-                new MartProduct(20L, 4500L, products.get(3), marts.get(2), discounts.get(6)),
+                new MartProduct(20L, 4500L, products.get(3), marts.get(2), discounts.get(2)),
                 new MartProduct(30L, 2000L, products.get(6), marts.get(2), null),
 
                 // 마트 4
-                new MartProduct(20L, 4500L, products.get(3), marts.get(3), discounts.get(7)),
+                new MartProduct(20L, 4500L, products.get(3), marts.get(3), discounts.get(3)),
                 new MartProduct(30L, 2000L, products.get(6), marts.get(3), null),
 
                 // 마트 5
                 new MartProduct(40L, 1500L, products.get(1), marts.get(4), null),
-                new MartProduct(30L, 4600L, products.get(3), marts.get(4), discounts.get(8)),
-                new MartProduct(20L, 1500L, products.get(6), marts.get(4), discounts.get(4))
+                new MartProduct(30L, 4600L, products.get(3), marts.get(4), discounts.get(2)),
+                new MartProduct(20L, 1500L, products.get(6), marts.get(4), discounts.get(0))
         );
         martProductRepository.saveAll(martProducts);
 
