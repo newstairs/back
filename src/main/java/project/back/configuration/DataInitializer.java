@@ -95,6 +95,8 @@ public class DataInitializer implements CommandLineRunner {
         /* 회원 카트에 담긴 상품 목록 */
         Member userA = new Member("test@test.com", "회원A");
         memberRepository.save(userA);
+        Member userB = new Member("test1@test.com", "회원B");
+        memberRepository.save(userB);
 
         // 카트에 상품 추가
         List<Cart> cartItems = Arrays.asList(
