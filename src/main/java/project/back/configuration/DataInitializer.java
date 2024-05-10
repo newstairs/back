@@ -64,7 +64,6 @@ public class DataInitializer implements CommandLineRunner {
         );
         discountRepository.saveAll(discounts);
 
-
         /* 마트별 품목 가격 및 할인율 */
         List<MartProduct> martProducts = Arrays.asList(
                 // 마트 1
