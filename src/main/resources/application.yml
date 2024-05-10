@@ -61,3 +61,8 @@ jasypt:
   encryptor:
     bean: jasyptStringEncryptor
     password : 5678
+
+kakao:
+  rest:
+    api:
+      key: ENC(nblnVxukBtIi6C3vRCb6oYfZMZGOCi9lK+p+KtVkAYI0sr+4MGNnttYcrktuJgIq)
