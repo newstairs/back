@@ -2,6 +2,7 @@ package project.back.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,15 +22,15 @@ public class MartJoinController {
     private final JwtUtill jwtUtill;
 
     //주소 끌고 와서 위도 경도 api를 통해서 받아온다.
-    @GetMapping("/marts/marts")
-    public List<MartJoinContentDto> getMartPlace() {
+    @GetMapping("/marts/marts/{member_id}")
+    public ResponseEntity<List<MartJoinContentDto>> getMartPlace(@PathVariable Long member_id) {
 //        String access_token=req.getHeader("Authorization").substring(7);
 //        Long memberId = jwtUtill.getidfromtoken(access_token);
 
-//        String address = martJoinService.findAddress(member_id);
-//
-        MartLocationDto martLocationDto = martJoinService.findLatitudeLongitude("전북 삼성동 100");
-
-        return martJoinService.searchMarts(martLocationDto.getLatitude(), martLocationDto.getLongitude(), 20000);
+        String address = martJoinService.findAddress(member_id);
+        System.out.println("address = " + address);
+        // "전북 삼성동 100"
+        MartLocationDto martLocationDto = martJoinService.findLatitudeLongitude(address);
+        return ResponseEntity.ok(martJoinService.searchMarts(martLocationDto.getLatitude(), martLocationDto.getLongitude(), 20000));
     }
 }

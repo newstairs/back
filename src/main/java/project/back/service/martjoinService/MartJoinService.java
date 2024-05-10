@@ -5,21 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import project.back.dto.MartJoinContentDto;
 import project.back.dto.MartLocationDto;
 import project.back.dto.MartJoinContentDto;
-import project.back.entitiy.Member;
+import project.back.entity.Member;
+import project.back.repository.memberjoinrepository.MemberJoinRepository;
 import project.back.repository.memberrepository.MemberRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class MartJoinService {
 
 
@@ -27,13 +27,19 @@ public class MartJoinService {
     private String restApiKey;
 
 
-    private final MemberRepository memberRepository;
+    private final MemberJoinRepository memberJoinRepository;
     private final RestTemplate restTemplate;
 
     //memberId를 통해 주소 찾아내기
     public String findAddress(Long memberId){
-        Member member = memberRepository.findByMemberId(memberId);
-        return member.getAddress();    // memberId에 해당하는 Member는 무조건 있다고 생각해 예외처리 x
+        Optional<Member> memberOptional = memberJoinRepository.findById(memberId);
+
+        if (memberOptional.isPresent()) {
+            Member member = memberOptional.get();
+            return member.getAddress();
+        } else {
+            throw new IllegalArgumentException("Member not found with id: " + memberId);
+        }
     }
 
     //주소를 받아서 카카오api 사용해서  위도와 경도 찾아내는 것
@@ -43,7 +49,7 @@ public class MartJoinService {
         //헤더 만들기
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Authorization", "KakaoAk " + restApiKey);
+        headers.set("Authorization", "KakaoAK " + restApiKey);
 
         //엔티티 만들기
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -59,8 +65,8 @@ public class MartJoinService {
                 if (!documents.isEmpty()) {
                     Map<String, Object> document = documents.get(0);
                     Map<String, Object> addressInfo = (Map<String, Object>) document.get("address");
-                    double latitude = (double) addressInfo.get("y");
-                    double longitude =  (double) addressInfo.get("x");
+                    double latitude = Double.parseDouble((String)addressInfo.get("y")) ;
+                    double longitude =  Double.parseDouble((String) addressInfo.get("x"));
 
                     MartLocationDto martLocationDto = MartLocationDto.builder()
                             .latitude(latitude)
@@ -94,24 +100,14 @@ public class MartJoinService {
         //restTemplate 이용해서
         ResponseEntity<Map> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
-        // entity사용안하고 string 으로 바로 응답받는 예시 GET 요청을 보내고 JSON 응답을 받음
-//        String jsonResponse = restTemplate.getForObject(apiUrl, String.class);
-
-
-//        if (responseEntity.getStatusCode() == HttpStatus.OK) {
-//            Map<String, Object> responseBody = responseEntity.getBody();
-//            if (responseBody != null && responseBody.containsKey("documents")) {
-//                return (List<Map<String, Object>>) responseBody.get("documents");
-//            }
-//        }
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             Map<String, Object> responseBody = responseEntity.getBody();
             if (responseBody != null && responseBody.containsKey("documents")) {
                 List<Map<String, Object>> documents = (List<Map<String, Object>>) responseBody.get("documents");
-                List<MartJoinContentDto> pharmacies = new ArrayList<>();
+                List<MartJoinContentDto> marts = new ArrayList<>();
 
                 for (Map<String, Object> document : documents) {
-                    MartJoinContentDto pharmacy = MartJoinContentDto.builder()
+                    MartJoinContentDto mart = MartJoinContentDto.builder()
                             //필요한거 Dto고쳐가면서 추가 해주면 된다.
                             .id( (String) document.get("id"))
                             .distance((String) document.get("distance"))
@@ -121,9 +117,9 @@ public class MartJoinService {
                             .phone((String) document.get("phone"))
                             .build();
 
-                    pharmacies.add(pharmacy);
+                    marts.add(mart);
                 }
-                return pharmacies;
+                return marts;
             }
         }
 

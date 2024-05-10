@@ -35,9 +35,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize)->{
                     authorize//.requestMatchers("/api1","/code/**","/mypage/**").hasRole("user")
-                            //.requestMatchers("/login/**","/","/test/**","/reqlogin/**",tokenuri,userinfouri,"http://krmp-proxy.9rum.cc:3128/**","/logouts").permitAll()
-                            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                            .requestMatchers("/test").hasRole("user")
+                            //.requestMatchers("/login/**","/","/test/**","/reqlogin/**",tokenuri,userinfouri,"http://krmp-proxy.9rum.cc:3128/**","/logouts,"/marts/**").permitAll()
+//                            .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+//                            .requestMatchers("/test").hasRole("user")
+                            //위에 두줄 수정함 (김정규)
                             .anyRequest().permitAll();
 
                 })
