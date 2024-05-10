@@ -26,8 +26,7 @@ public class Member extends UpdateCreateTime{
     @Column(name="address")
     private String address;
 
-    public Member(Long memberId, String email, String name, String address) {
-        this.memberId = memberId;
+    public Member( String email, String name, String address) {
         this.email = email;
         this.name = name;
         this.address = address;
