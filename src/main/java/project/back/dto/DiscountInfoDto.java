@@ -12,14 +12,16 @@ import java.math.RoundingMode;
 @AllArgsConstructor
 public class DiscountInfoDto {
     private Long productId;
+    private String productName;
     private Long martId;
     private Long stock;
     private BigDecimal price;
     private BigDecimal discountRate;
     private Long finalPrice;
 
-    public DiscountInfoDto(Long productId, Long martId, Long stock, Long price, BigDecimal discountRate) {
+    public DiscountInfoDto(Long productId, String productName, Long martId, Long stock, Long price, BigDecimal discountRate) {
         this.productId = productId;
+        this.productName = productName;
         this.martId = martId;
         this.stock = stock;
         this.price = BigDecimal.valueOf(price);

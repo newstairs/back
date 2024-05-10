@@ -17,7 +17,8 @@ public interface MartProductRepository extends JpaRepository<MartProduct, Long> 
             "GROUP BY mp.mart HAVING COUNT(DISTINCT mp.product) = :numberOfProducts")
     List<Mart> findMartsSellingAllProducts(List<Product> products, Long numberOfProducts);
 
-    @Query("SELECT new project.back.dto.DiscountInfoDto(mp.product.productId, mp.mart.martId, mp.stock, mp.price, d.discountRate) " +
+    @Query("SELECT new project.back.dto.DiscountInfoDto(" +
+            "mp.product.productId, mp.product.productName, mp.mart.martId, mp.stock, mp.price, d.discountRate) " +
             "FROM MartProduct mp LEFT JOIN mp.discount d " +
             "WHERE mp.product IN :products AND mp.mart IN :marts")
     List<DiscountInfoDto> findDiscountsByProductsAndMarts(List<Product> products, List<Mart> marts);
