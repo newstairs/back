@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cart_id", nullable = false, unique = true)
+    @Column(name = "cart_id")
     private Long cartId;
 
     @Column(name = "quantity")
