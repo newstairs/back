@@ -22,7 +22,7 @@ public class MartJoinController {
     private final JwtUtill jwtUtill;
 
     //주소 끌고 와서 위도 경도 api를 통해서 받아온다.
-    @GetMapping("/marts/marts")
+    @GetMapping("/marts/marts/{member_id}")
     public ResponseEntity<List<MartJoinContentDto>> getMartPlace(HttpServletRequest req) {
         String access_token=req.getHeader("Authorization").substring(7);
         Long memberId = jwtUtill.getidfromtoken(access_token);

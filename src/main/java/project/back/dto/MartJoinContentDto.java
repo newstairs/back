@@ -4,10 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Data
-@RequiredArgsConstructor
+@Getter
 public class MartJoinContentDto {
     private String id;
     private String placeName;

@@ -2,11 +2,11 @@ package project.back.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 
-@Data
-@RequiredArgsConstructor
+@Getter
 public class MartLocationDto {
 
     private double latitude;
