@@ -37,9 +37,9 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
   datasource:
-    url: jdbc:mysql://localhost:3306/testdb
-    username: root
-    password: 1234
+    url: ENC(EO7qYXT+s8nB8MjIIzbdgylu39ZmMcORxrcHyFe1zo3/WusiDRp2DJBYiNHgF8em)
+    username: ENC(xr6m+OzCYbuFcv1RPhsjpw==)
+    password: ENC(91DfR8uWhet4vgXhB1dgc82CVp6whK+m)
   jpa:
     properties:
       hibernate:
@@ -56,3 +56,13 @@ jwt:
 app:
   upload:
     dir: uploads/img
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+
+
+kakao:
+  rest:
+    api:
+      key: ENC(nblnVxukBtIi6C3vRCb6oYfZMZGOCi9lK+p+KtVkAYI0sr+4MGNnttYcrktuJgIq)
