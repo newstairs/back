@@ -34,10 +34,9 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
 
     }
 
-    //address 부분땜에 고쳤습니다 임시로
     @Override
     public Long membersave(MemberDto m) {
-        Member member=new Member(m.getEmail(),m.getUsername(),"ㅁㄴ");
+        Member member=new Member(m.getEmail(),m.getUsername());
         member.setCreate_time(LocalDateTime.now());
 
         em.persist(member);
