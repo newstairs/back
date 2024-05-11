@@ -1,12 +1,14 @@
 package project.back.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Entity
-@Data
+@Getter
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +33,12 @@ public class Review {
     private Mart mart;
 
 
-
-
+    @Builder
+    public Review(Long reviewId,String reviewContent, BigDecimal score, Member member, Mart mart) {
+        this.reviewId = reviewId;
+        this.reviewContent = reviewContent;
+        this.score = score;
+        this.member = member;
+        this.mart = mart;
+    }
 }
