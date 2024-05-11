@@ -42,16 +42,9 @@ dependencies {
 
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1'
-	//암호화
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 
 	// macOS
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.109.Final:osx-aarch_64'
-}
-
-test {
-	useJUnitPlatform()
-	systemProperty "jasypt.encryptor.password", project.getProperties().get("jasypt.encryptor.password")
 }
 
 tasks.named('test') {

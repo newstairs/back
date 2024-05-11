@@ -98,8 +98,7 @@ public class DataInitializer implements CommandLineRunner {
         martProductRepository.saveAll(martProducts);
 
         /* 회원 카트에 담긴 상품 목록 */
-        //address 받아오는거 때문에 수정 했습니다 (김정규)
-        Member userA = new Member("test@test.com", "회원A","전북 삼성동 100");
+        Member userA = new Member("test@test.com", "회원A");
         memberRepository.save(userA);
 
         // 카트에 상품 추가
