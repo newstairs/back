@@ -4,14 +4,15 @@ spring:
     oauth2:
       client:
         registration:
+          kakao:
             client-id: {REST Api Key} #
             redirect-uri: https://k56733b335962a.user-app.krampoline.com/login/oauth2/callback/kakao
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             scope:
-              - profile_nickname
-              - profile_image
-              - account_email
+            - profile_nickname
+            - profile_image
+            - account_email
             client-name: Kakao
         provider:
           kakao:
@@ -48,3 +49,8 @@ jwt:
 app:
   upload:
     dir: uploads/img
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
+    password: temp # 의미없는 임시 값입니다
