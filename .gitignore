@@ -42,4 +42,4 @@ out/
 
 ### 설정파일 ###
 application.yml
-application-local.yml
+# application-local.yml
