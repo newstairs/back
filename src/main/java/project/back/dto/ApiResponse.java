@@ -1,5 +1,7 @@
 package project.back.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +12,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(Include.NON_EMPTY)
 @JsonPropertyOrder({"success", "message","data"})
 public class ApiResponse<T> implements Serializable {
 
