@@ -42,10 +42,8 @@ public class ReviewController {
 
     //리뷰 + 평점 수정 patch
     @PatchMapping("/{review_id}")
-    public ResponseEntity<ReviewDto> updateReview( @PathVariable Long reviewId,
-                                                   @RequestParam(value = "reviewContent", required = false) String content,
-                                                   @RequestParam(value = "score", required = false) BigDecimal score) {
-        ReviewDto updatedReview = reviewService.updateReview(reviewId, content, score);
+    public ResponseEntity<ReviewDto> updateReview( @PathVariable Long review_id,@RequestBody ReviewDto reviewDto) {
+        ReviewDto updatedReview = reviewService.updateReview(review_id, reviewDto.getReviewContent(), reviewDto.getScore());
         return ResponseEntity.ok(updatedReview);
     }
 }

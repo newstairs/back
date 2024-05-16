@@ -28,7 +28,7 @@ public class ReviewService {
     public List<ReviewDto> getReviewByMartId(Long martId){
         List<ReviewDto> reviewDtos = new ArrayList<>();
 
-        List<Review> reviews = reviewRepository.findByMartId(martId); //리뷰 없을시 빈 리스트 반
+        List<Review> reviews = reviewRepository.findByMart_Id(martId); //리뷰 없을시 빈 리스트 반
         for (Review review : reviews) {
             ReviewDto reviewDto = ReviewDto.builder()
                     .reviewContent(review.getReviewContent())
@@ -73,8 +73,8 @@ public class ReviewService {
         // Builder를 사용하여 기존 리뷰의 내용과 평점을 수정
         Review updatedReview = Review.builder()
                 .reviewId(reviewId) // 기존 리뷰의 ID를 유지
-                .reviewContent(content)
-                .score(score)
+                .reviewContent(content != null ? content : review.getReviewContent()) // content가 null이 아닌 경우에만 새로운 리뷰 내용을 설정
+                .score(score != null ? score : review.getScore()) // score가 null이면 기존 리뷰의 score를 유지하도록 설정
                 .member(review.getMember()) // 기존 리뷰와 동일한 회원 정보 사용
                 .mart(review.getMart()) // 기존 리뷰와 동일한 마트 정보 사용
                 .build();

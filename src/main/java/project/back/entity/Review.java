@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +23,9 @@ public class Review {
     @Column(name = "score", precision = 2, scale = 1, nullable = false)
     private BigDecimal score;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mart_id")
