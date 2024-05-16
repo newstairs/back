@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +29,7 @@ public class CartController {
     private final RequestMemberMapper requestMemberMapper;
 
     /**
-     * productName을 포함하는 검색한 모든 재료 검색
+     * [GET] productName을 포함하는 검색한 모든 재료 검색
      * @param productName 상품이름(String)
      * @return 상품이름을 포함하는 모든 재료
      */
@@ -40,6 +41,12 @@ public class CartController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * [POST] 장바구니에 상품추가
+     * @param cartProductDto (productId)
+     * @param request 유저정보를 포함하고있는 HttpServletRequest
+     * @return 저장된 상품에 대한 객체(productId, quantity)와 상품이름
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<CartProductDto>> addProduct(
             @RequestBody CartProductDto cartProductDto, HttpServletRequest request
