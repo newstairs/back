@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import project.back.dto.ApiResponse;
 import project.back.dto.CartDto;
-import project.back.dto.CartProductDto;
 import project.back.dto.ProductSearchDto;
 import project.back.entity.Cart;
 import project.back.entity.Member;
@@ -34,6 +33,25 @@ public class CartService {
     private final MemberRepository memberRepository;
 
     /**
+     * 장바구니 목록 조회
+     * @param memberId 사용자정보
+     * @return 장바구니 목록
+     * @throws EntityNotFoundException 사용자정보를 찾을 수 없는경우
+     */
+    public ApiResponse<List<CartDto>> getCartsByMemberId(Long memberId){
+        Member member = getMemberByMemberId(memberId);
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+                .map(cart -> CartDto.builder()
+                        .productId(cart.getProduct().getProductId())
+                        .productName(cart.getProduct().getProductName())
+                        .productImgUrl(cart.getProduct().getProductImgUrl())
+                        .quantity(cart.getQuantity())
+                        .build()
+                )
+                .toList();
+        return ApiResponse.success(cartDtos, CartSuccessMessage.SUCCESS_GET.getMessage());
+    }
+    /**
      * 상품 검색
      *
      * @param productName 상품이름(String)
@@ -41,7 +59,6 @@ public class CartService {
      * @throws NoContentFoundException productName을 포함하는 상품이 없는경우
      */
     public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
-        //TODO: 그냥 List로 받아오게 수정하기(productRepository)
         List<Product> products = productRepository.findAllByProductNameContaining(productName);
         log.info("productName: {}, products: {}", productName, products);
 
@@ -104,7 +121,7 @@ public class CartService {
     /**
      * 수량 수정
      * @param productId
-     * @param quantityChange "+", "-", "숫자"
+     * @param sign "+", "-", "숫자"
      * @param memberId
      * @return 장바구니 목록(CartDto)
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우

@@ -1,6 +1,5 @@
 package project.back.controller;
 
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.back.dto.ApiResponse;
 import project.back.dto.CartDto;
-import project.back.dto.CartProductDto;
-import project.back.dto.ProductDto;
 import project.back.dto.ProductSearchDto;
 import project.back.etc.RequestMemberMapper;
-import project.back.etc.aboutlogin.JwtUtill;
 import project.back.service.CartService;
 
 @RestController
@@ -28,6 +24,18 @@ public class CartController {
 
     private final CartService cartService;
     private final RequestMemberMapper requestMemberMapper;
+
+    /**
+     * [GET] 장바구니 목록 조회
+     * @param request 유저정보를 포함하고있는 HttpServletRequest
+     * @return 장바구니 목록
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CartDto>>> getCart(HttpServletRequest request){
+        Long memberId = requestMemberMapper.RequestToMemberId(request);
+        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
+        return ResponseEntity.ok(result);
+    }
     /**
      * [GET] productName을 포함하는 검색한 모든 재료 검색
      * @param productName 상품이름(String)
