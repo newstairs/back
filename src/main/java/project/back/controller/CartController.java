@@ -64,11 +64,11 @@ public class CartController {
      * @param request 유저정보를 포함하고있는 HttpServletRequest
      * @return 장바구니 리스트
      */
-    @PatchMapping("/{productId}/{quantityChange}")
+    @PatchMapping("/{productId}/{sign}")
     public ResponseEntity<ApiResponse<List<CartDto>>> updateQuantity(
-            @PathVariable Long productId, @PathVariable String quantityChange, HttpServletRequest request){
+            @PathVariable Long productId, @PathVariable String sign, HttpServletRequest request){
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.updateQuantity(productId, quantityChange, memberId);
+        ApiResponse<List<CartDto>> result = cartService.updateQuantity(productId, sign, memberId);
         return ResponseEntity.ok(result);
     }
 

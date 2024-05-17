@@ -106,22 +106,21 @@ public class CartService {
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange에 이상한 값을 넣었을 경우
      */
-    public ApiResponse<List<CartDto>> updateQuantity(Long productId, String quantityChange, Long memberId){
+    public ApiResponse<List<CartDto>> updateQuantity(Long productId, String sign, Long memberId){
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(productId);
 
         Cart cart = cartRepository.findByMemberEqualsAndProductEquals(member, product)
                 .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
         // TODO: "+", "-", Enum이 더 나은것인가, 하드코딩이 나은가
-        if(quantityChange.equals(quantityUpdateSign.MINUS.getValue())){
+        if(sign.equals(quantityUpdateSign.MINUS.getValue())){
             cart.minusQuantity();
         }
-        if(quantityChange.equals(quantityUpdateSign.PLUS.getValue())){
+        if(sign.equals(quantityUpdateSign.PLUS.getValue())){
             cart.plusQuantity();
         }
-        if(!quantityChange.equals(quantityUpdateSign.MINUS.getValue())
-                && !quantityChange.equals(quantityUpdateSign.PLUS.getValue())){
-            Long quantity = Optional.ofNullable(quantityChange)
+        if(!sign.equals(quantityUpdateSign.MINUS.getValue()) && !sign.equals(quantityUpdateSign.PLUS.getValue())){
+            Long quantity = Optional.ofNullable(sign)
                     .map(Long::parseLong)
                     .orElseThrow(() -> new IllegalArgumentException(CartErrorMessage.INVALID_QUANTITY.getMessage()));
             cart.updateQuantity(quantity);
