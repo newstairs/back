@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
 import project.back.dto.CartDto;
-import project.back.dto.CartProductDto;
 import project.back.dto.ProductSearchDto;
 import project.back.entity.Product;
 import project.back.etc.commonException.ConflictException;
@@ -69,58 +68,43 @@ class CartServiceTest {
     void 상품추가_테스트(){
         Long memberId = 1L;
         Long productId = 1L;
-        CartProductDto cartProductDto = CartProductDto.builder()
+        CartDto cartDto = CartDto.builder()
                 .productId(productId)
                 .build();
 
-        ApiResponse<CartProductDto> addResult = cartService.addProduct(cartProductDto, memberId);
+        ApiResponse<List<CartDto>> result = cartService.addProduct(cartDto, memberId);
+        CartDto addedProduct = result.getData().stream().filter(c -> c.getProductId() == productId).toList().get(0);
 
-        assertThat(addResult.getData().getProductId()).isEqualTo(productId);
-        assertThat(addResult.getData().getQuantity()).isEqualTo(1L);
+        assertThat(addedProduct).isNotNull();
     }
 
-    @Test
-    @DisplayName("상품추가 예외테스트: 사용자 없음 ")
-    void 상품추가_사용자_없음_예외테스트(){
-        Long memberId = 3L;
-        Long productId = 1L;
-
-        CartProductDto cartProductDto = CartProductDto.builder()
+    @ParameterizedTest
+    @CsvSource(value = {"1000,1", "1,10000"})
+    @DisplayName("상품추가 예외테스트: 사용자 없음(1000), 상품 없음(10000) ")
+    void 상품추가_예외테스트_EntityNotFoundException(Long memberId, Long productId){
+        CartDto cartDto = CartDto.builder()
                 .productId(productId)
                 .build();
 
-        assertThatThrownBy(() -> cartService.addProduct(cartProductDto, memberId))
+        assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @Test
-    @DisplayName("상품추가 예외테스트: 상품 없음")
-    void 상품추가_상품_없음_예외테스트(){
-        Long memberId = 1L;
-        Long productId = 10000L;
-
-        CartProductDto cartProductDto = CartProductDto.builder()
-                .productId(productId)
-                .build();
-
-        assertThatThrownBy(() -> cartService.addProduct(cartProductDto, memberId))
-                .isInstanceOf(EntityNotFoundException.class);
-    }
 
     @Test
     @DisplayName("상품추가 예외테스트: 중복된 상품")
     @Transactional
-    void 상품추가_중복된_상품_예외테스트(){
+    void 상품추가_예외테스트_중복된_상품_ConflictException(){
         Long memberId = 1L;
         Long productId = 1L;
 
-        CartProductDto cartProductDto = CartProductDto.builder()
+        CartDto cartDto = CartDto.builder()
                 .productId(productId)
                 .build();
 
-        cartService.addProduct(cartProductDto, memberId); // 첫번째 저장
+        cartService.addProduct(cartDto, memberId); // 첫번째 저장
 
-        assertThatThrownBy(() -> cartService.addProduct(cartProductDto, memberId)) // 두번째 저장 -> ConflictException
+        assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId)) // 두번째 저장 -> ConflictException
                 .isInstanceOf(ConflictException.class);
 
     }
@@ -133,13 +117,13 @@ class CartServiceTest {
         Long memberId = 1L;
         Long productId = 1L;
 
-        CartProductDto cartProductDto = CartProductDto.builder().productId(productId).build();
-        cartService.addProduct(cartProductDto, memberId); // 장바구니에 1L인 상품추가
+        CartDto cartDto = CartDto.builder().productId(productId).build();
+        cartService.addProduct(cartDto, memberId); // 장바구니에 1L인 상품추가
         cartService.updateQuantity(memberId, "6", productId); // 6개로 세팅
 
         ApiResponse<List<CartDto>> response = cartService.updateQuantity(productId, quantityChange, memberId);
         Long result = response.getData().stream()
-                .filter(cartDto -> cartDto.getProductId() == productId)
+                .filter(c -> c.getProductId() == productId)
                 .toList()
                 .get(0).getQuantity();
         System.out.println("result = " + result + ", expected = " + expected);
@@ -155,8 +139,8 @@ class CartServiceTest {
         Long memberId = 1L;
         Long productId = 1L;
 
-        CartProductDto cartProductDto = CartProductDto.builder().productId(productId).build();
-        cartService.addProduct(cartProductDto, memberId); // 장바구니에 1L인 상품추가, quantity=1
+        CartDto cartDto = CartDto.builder().productId(productId).build();
+        cartService.addProduct(cartDto, memberId); // 장바구니에 1L인 상품추가, quantity=1
 
         assertThatThrownBy(() -> cartService.updateQuantity(productId, quantityChange, memberId))
                 .isInstanceOf(IllegalArgumentException.class);
