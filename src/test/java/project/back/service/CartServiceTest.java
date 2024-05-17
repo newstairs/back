@@ -29,6 +29,25 @@ class CartServiceTest {
     CartService cartService;
 
     @Test
+    @DisplayName("장바구니 조회 테스트")
+    void 장바구니_조회_테스트(){
+        Long memberId = 1L;
+
+        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
+
+        assertThat(result.getData()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("장바구니 조회 예외 테스트")
+    void 장바구니_조회_예외_테스트_EntityNotFoundException(){
+        Long memberId = 1000L;
+
+        assertThatThrownBy(() -> cartService.getCartsByMemberId(memberId))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
     @DisplayName("상품검색테스트")
     @Transactional
     void 재료검색테스트(){
@@ -41,13 +60,6 @@ class CartServiceTest {
         // "당근"을 포함하는 모든 상품을 가져오는지
         ApiResponse<List<ProductSearchDto>> result2 = cartService.findAllByProductName("당근");
         List<ProductSearchDto> result2Datas = result2.getData();
-
-        for (ProductSearchDto resultData : resultDatas) {
-            System.out.println("resultDatum = " + resultData);
-        }
-        for (ProductSearchDto result2Data : result2Datas) {
-            System.out.println("result2Data = " + result2Data);
-        }
 
         assertThat(resultDatas.size()).isEqualTo(1);
         assertThat(result2Datas.size()).isEqualTo(2);
@@ -73,7 +85,10 @@ class CartServiceTest {
                 .build();
 
         ApiResponse<List<CartDto>> result = cartService.addProduct(cartDto, memberId);
-        CartDto addedProduct = result.getData().stream().filter(c -> c.getProductId() == productId).toList().get(0);
+        CartDto addedProduct = result.getData().stream()
+                .filter(c -> c.getProductId() == productId)
+                .toList()
+                .get(0);
 
         assertThat(addedProduct).isNotNull();
     }
