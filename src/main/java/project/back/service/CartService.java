@@ -15,6 +15,8 @@ import project.back.entity.Member;
 import project.back.entity.Product;
 import project.back.etc.commonException.ConflictException;
 import project.back.etc.commonException.NoContentFoundException;
+import project.back.etc.enums.cart.CartErrorMessage;
+import project.back.etc.enums.cart.CartSuccessMessage;
 import project.back.etc.enums.cart.quantityUpdateSign;
 import project.back.repository.CartRepository;
 import project.back.repository.ProductRepository;
@@ -25,15 +27,6 @@ import project.back.repository.memberrepository.MemberRepository;
 @RequiredArgsConstructor
 public class CartService {
 
-    private static final String NOT_EXIST_PRODUCT = "'%s'는 존재하지 않는 상품입니다.";
-    private static final String NOT_FOUND_MEMBER = "사용자 정보를 찾을 수 없습니다.";
-    private static final String NOT_FOUND_PRODUCT = "상품을 찾을 수 없습니다.";
-    private static final String SUCCESS_SEARCH = "검색에 성공 했습니다.";
-    private static final String ALREADY_EXIST_PRODUCT = "이미 장바구니에 존재하는 상품입니다.";
-    private static final String SUCCESS_ADD_PRODUCT= "장바구니에 '%s'이(가) 담겼습니다.";
-    private static final String NOT_EXIST_PRODUCT_IN_CART = "장바구니에 존재하지 않는 상품입니다.";
-    private static final String INVALID_QUANTITY_MESSAGE = "1 이상의 숫자만 입력해주세요";
-    private static final String SUCCESS_UPDATE_CART = "'%s'의 수량을 변경했습니다.";
     private static final Long FIRST_ADD_VALUE = 1L;
 
     private final CartRepository cartRepository;
@@ -55,7 +48,8 @@ public class CartService {
         List<Product> products = allByProductName.get();
 
         if(products.isEmpty()){
-            throw new NoContentFoundException(String.format(NOT_EXIST_PRODUCT, productName));
+            throw new NoContentFoundException(
+                    String.format(CartErrorMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
         }
 
         List<ProductSearchDto> ProductSearchDtos = products.stream()
@@ -66,7 +60,7 @@ public class CartService {
                         .build())
                 .toList();
 
-        return ApiResponse.success(ProductSearchDtos, SUCCESS_SEARCH);
+        return ApiResponse.success(ProductSearchDtos, CartSuccessMessage.SUCCESS_SEARCH.getMessage());
     }
 
     /**
@@ -82,7 +76,7 @@ public class CartService {
         Product product = getProductByProductId(cartProductDto.getProductId());
         // 이미 장바구니에 같은 상품이 담겨있는 경우
         cartRepository.findByMemberEqualsAndProductEquals(member, product)
-                .ifPresent(c -> {throw new ConflictException(ALREADY_EXIST_PRODUCT);});
+                .ifPresent(c -> {throw new ConflictException(CartErrorMessage.ALREADY_EXIST_PRODUCT.getMessage());});
 
         Cart cart = Cart.builder()
                 .product(product)
@@ -98,7 +92,8 @@ public class CartService {
                 .build();
 
         return ApiResponse.success(
-                cartProductDtoResult, String.format(SUCCESS_ADD_PRODUCT, product.getProductName())
+                cartProductDtoResult,
+                String.format(CartSuccessMessage.SUCCESS_ADD_PRODUCT.getMessage(), product.getProductName())
         );
     }
 
@@ -116,7 +111,7 @@ public class CartService {
         Product product = getProductByProductId(productId);
 
         Cart cart = cartRepository.findByMemberEqualsAndProductEquals(member, product)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_PRODUCT_IN_CART));
+                .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
         // TODO: "+", "-", Enum이 더 나은것인가, 하드코딩이 나은가
         if(quantityChange.equals(quantityUpdateSign.MINUS.getValue())){
             cart.minusQuantity();
@@ -128,7 +123,7 @@ public class CartService {
                 && !quantityChange.equals(quantityUpdateSign.PLUS.getValue())){
             Long quantity = Optional.ofNullable(quantityChange)
                     .map(Long::parseLong)
-                    .orElseThrow(() -> new IllegalArgumentException(INVALID_QUANTITY_MESSAGE));
+                    .orElseThrow(() -> new IllegalArgumentException(CartErrorMessage.INVALID_QUANTITY.getMessage()));
             cart.updateQuantity(quantity);
         }
 
@@ -144,19 +139,20 @@ public class CartService {
                 )
                 .toList();
 
-        return ApiResponse.success(cartDtos, String.format(SUCCESS_UPDATE_CART, cart.getProduct().getProductName()));
+        return ApiResponse.success(cartDtos,
+                String.format(CartSuccessMessage.SUCCESS_UPDATE_CART.getMessage(), cart.getProduct().getProductName()));
     }
 
     // member 검증 및 객체가져오는 메서드
     private Member getMemberByMemberId(Long memberId){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_FOUND_MEMBER.getMessage()));
         return member;
     }
     // product 검증 및 객체가져오는 메서드
     private Product getProductByProductId(Long productId){
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_FOUND_PRODUCT.getMessage()));
         return product;
     }
 }

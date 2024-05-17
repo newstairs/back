@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import project.back.etc.enums.cart.CartErrorMessage;
 
 
 @Entity
@@ -46,14 +45,16 @@ public class Cart {
 
     public void minusQuantity(){
         if(this.quantity<2){
-            throw new IllegalArgumentException("수량은 1개 이상이어야 합니다."+"삭제를 원한다면 삭제버튼을 눌러주세요");
+            throw new IllegalArgumentException(
+                    CartErrorMessage.QUANTITY_ONE_OR_MORE.getMessage()+CartErrorMessage.DELETE_RECOMMEND.getMessage()
+            );
         }
         this.quantity--;
     }
 
     public void updateQuantity(long quantity) {
         if(quantity<1){
-            throw new IllegalArgumentException("수량은 1개 이상이어야 합니다.");
+            throw new IllegalArgumentException(CartErrorMessage.QUANTITY_ONE_OR_MORE.getMessage());
         }
         this.quantity = quantity;
     }
