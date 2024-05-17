@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
 import project.back.dto.CartDto;
 import project.back.dto.ProductSearchDto;
@@ -38,6 +39,7 @@ public class CartService {
      * @return 장바구니 목록
      * @throws EntityNotFoundException 사용자정보를 찾을 수 없는경우
      */
+    @Transactional
     public ApiResponse<List<CartDto>> getCartsByMemberId(Long memberId){
         Member member = getMemberByMemberId(memberId);
         List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
@@ -53,7 +55,6 @@ public class CartService {
     }
     /**
      * 상품 검색
-     *
      * @param productName 상품이름(String)
      * @return 상품이름을 포함하는 상품들(과 이미지)
      * @throws NoContentFoundException productName을 포함하는 상품이 없는경우
@@ -86,6 +87,7 @@ public class CartService {
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우
      * @throws ConflictException 같은 상품이 이미 담겨있는 경우
      */
+    @Transactional
     public ApiResponse<List<CartDto>> addProduct(CartDto cartDto, Long memberId){
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(cartDto.getProductId());
@@ -127,6 +129,7 @@ public class CartService {
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange에 이상한 값을 넣었을 경우
      */
+    @Transactional
     public ApiResponse<List<CartDto>> updateQuantity(Long productId, String sign, Long memberId){
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(productId);
