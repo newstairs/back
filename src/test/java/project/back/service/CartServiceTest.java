@@ -6,10 +6,14 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
+import project.back.dto.CartDto;
 import project.back.dto.CartProductDto;
 import project.back.dto.ProductSearchDto;
 import project.back.entity.Product;
@@ -119,5 +123,51 @@ class CartServiceTest {
         assertThatThrownBy(() -> cartService.addProduct(cartProductDto, memberId)) // 두번째 저장 -> ConflictException
                 .isInstanceOf(ConflictException.class);
 
+    }
+
+    @ParameterizedTest
+    @DisplayName("상품 수량 변경 테스트")
+    @CsvSource(value = {"+, 7", "-, 5", "5, 5"})
+    @Transactional
+    void 상품_수량_변경_테스트(String quantityChange, Long expected){
+        Long memberId = 1L;
+        Long productId = 1L;
+
+        CartProductDto cartProductDto = CartProductDto.builder().productId(productId).build();
+        cartService.addProduct(cartProductDto, memberId); // 장바구니에 1L인 상품추가
+        cartService.updateQuantity(memberId, "6", productId); // 6개로 세팅
+
+        ApiResponse<List<CartDto>> response = cartService.updateQuantity(productId, quantityChange, memberId);
+        Long result = response.getData().stream()
+                .filter(cartDto -> cartDto.getProductId() == productId)
+                .toList()
+                .get(0).getQuantity();
+        System.out.println("result = " + result + ", expected = " + expected);
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-", "0", " ", ""})
+    @DisplayName("상품 수량 변경 예외 테스트: -한 값이 0인 경우, 직접입력한 값이 0인 경우, 직접입력한값이 적절하지 않은 경우")
+    @Transactional
+    void 상품_수량_변경_예외_테스트_IllegalArgumentException(String quantityChange){
+        Long memberId = 1L;
+        Long productId = 1L;
+
+        CartProductDto cartProductDto = CartProductDto.builder().productId(productId).build();
+        cartService.addProduct(cartProductDto, memberId); // 장바구니에 1L인 상품추가, quantity=1
+
+        assertThatThrownBy(() -> cartService.updateQuantity(productId, quantityChange, memberId))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"3,1,+", "1,1000,+", "1,1,+"})
+    @DisplayName("상품 수량 변경 예외 테스트: 사용자 없음, 상품 없음, 장바구니에 해당 상품없음")
+    @Transactional
+    void 상품_수량_변경_예외_테스트_EntityNotFoundException(Long memberId, Long productId, String quantityChange) {
+        assertThatThrownBy(() -> cartService.updateQuantity(productId, quantityChange, memberId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

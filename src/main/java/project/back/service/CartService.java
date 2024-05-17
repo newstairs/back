@@ -1,23 +1,21 @@
 package project.back.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import project.back.dto.ApiResponse;
+import project.back.dto.CartDto;
 import project.back.dto.CartProductDto;
-import project.back.dto.ProductDto;
 import project.back.dto.ProductSearchDto;
 import project.back.entity.Cart;
 import project.back.entity.Member;
 import project.back.entity.Product;
-import project.back.etc.aboutlogin.JwtUtill;
 import project.back.etc.commonException.ConflictException;
 import project.back.etc.commonException.NoContentFoundException;
+import project.back.etc.enums.cart.quantityUpdateSign;
 import project.back.repository.CartRepository;
 import project.back.repository.ProductRepository;
 import project.back.repository.memberrepository.MemberRepository;
@@ -27,13 +25,16 @@ import project.back.repository.memberrepository.MemberRepository;
 @RequiredArgsConstructor
 public class CartService {
 
-    private final String NOT_EXIST_PRODUCT = "'%s'는 존재하지 않는 상품입니다.";
-    private final String NOT_FOUND_MEMBER = "사용자 정보를 찾을 수 없습니다.";
-    private final String NOT_FOUND_PRODUCT = "상품을 찾을 수 없습니다.";
-    private final String SUCCESS_SEARCH = "검색에 성공 했습니다.";
-    private final String ALREADY_EXIST_PRODUCT = "이미 장바구니에 존재하는 상품입니다.";
-    private final String SUCCESS_ADD_PRODUCT= "장바구니에 '%s'이(가) 담겼습니다.";
-    private final Long FIRST_ADD_VALUE = 1L;
+    private static final String NOT_EXIST_PRODUCT = "'%s'는 존재하지 않는 상품입니다.";
+    private static final String NOT_FOUND_MEMBER = "사용자 정보를 찾을 수 없습니다.";
+    private static final String NOT_FOUND_PRODUCT = "상품을 찾을 수 없습니다.";
+    private static final String SUCCESS_SEARCH = "검색에 성공 했습니다.";
+    private static final String ALREADY_EXIST_PRODUCT = "이미 장바구니에 존재하는 상품입니다.";
+    private static final String SUCCESS_ADD_PRODUCT= "장바구니에 '%s'이(가) 담겼습니다.";
+    private static final String NOT_EXIST_PRODUCT_IN_CART = "장바구니에 존재하지 않는 상품입니다.";
+    private static final String INVALID_QUANTITY_MESSAGE = "1 이상의 숫자만 입력해주세요";
+    private static final String SUCCESS_UPDATE_CART = "'%s'의 수량을 변경했습니다.";
+    private static final Long FIRST_ADD_VALUE = 1L;
 
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
@@ -47,6 +48,7 @@ public class CartService {
      * @throws NoContentFoundException productName을 포함하는 상품이 없는경우
      */
     public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
+        //TODO: 그냥 List로 받아오게 수정하기(productRepository)
         Optional<List<Product>> allByProductName = productRepository.findAllByProductNameContaining(productName);
         log.info("productName: {}, allByProductName: {}", productName, allByProductName);
 
@@ -100,12 +102,58 @@ public class CartService {
         );
     }
 
+    /**
+     * 수량 수정
+     * @param productId
+     * @param quantityChange "+", "-", "숫자"
+     * @param memberId
+     * @return 장바구니 목록(CartDto)
+     * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
+     * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange에 이상한 값을 넣었을 경우
+     */
+    public ApiResponse<List<CartDto>> updateQuantity(Long productId, String quantityChange, Long memberId){
+        Member member = getMemberByMemberId(memberId);
+        Product product = getProductByProductId(productId);
+
+        Cart cart = cartRepository.findByMemberEqualsAndProductEquals(member, product)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_EXIST_PRODUCT_IN_CART));
+        // TODO: "+", "-", Enum이 더 나은것인가, 하드코딩이 나은가
+        if(quantityChange.equals(quantityUpdateSign.MINUS.getValue())){
+            cart.minusQuantity();
+        }
+        if(quantityChange.equals(quantityUpdateSign.PLUS.getValue())){
+            cart.plusQuantity();
+        }
+        if(!quantityChange.equals(quantityUpdateSign.MINUS.getValue())
+                && !quantityChange.equals(quantityUpdateSign.PLUS.getValue())){
+            Long quantity = Optional.ofNullable(quantityChange)
+                    .map(Long::parseLong)
+                    .orElseThrow(() -> new IllegalArgumentException(INVALID_QUANTITY_MESSAGE));
+            cart.updateQuantity(quantity);
+        }
+
+        cartRepository.save(cart);
+
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+                .map(c -> CartDto.builder()
+                        .productId(c.getProduct().getProductId())
+                        .productName(c.getProduct().getProductName())
+                        .productImgUrl(c.getProduct().getProductImgUrl())
+                        .quantity(c.getQuantity())
+                        .build()
+                )
+                .toList();
+
+        return ApiResponse.success(cartDtos, String.format(SUCCESS_UPDATE_CART, cart.getProduct().getProductName()));
+    }
+
+    // member 검증 및 객체가져오는 메서드
     private Member getMemberByMemberId(Long memberId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
         return member;
     }
-
+    // product 검증 및 객체가져오는 메서드
     private Product getProductByProductId(Long productId){
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_PRODUCT));
