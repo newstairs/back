@@ -28,7 +28,6 @@ public class CartController {
 
     private final CartService cartService;
     private final RequestMemberMapper requestMemberMapper;
-
     /**
      * [GET] productName을 포함하는 검색한 모든 재료 검색
      * @param productName 상품이름(String)
@@ -49,18 +48,18 @@ public class CartController {
      * @return 저장된 상품에 대한 객체(productId, quantity)와 상품이름
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<CartProductDto>> addProduct(
-            @RequestBody CartProductDto cartProductDto, HttpServletRequest request
-            ){
-        Long memberId = requestMemberMapper.RequestToMemberId(request); // TODO: JwtUtil자체에서 해결하도록 해보자
-        ApiResponse<CartProductDto> result = cartService.addProduct(cartProductDto, memberId);
+    public ResponseEntity<ApiResponse<List<CartDto>>> addProduct(
+            @RequestBody CartDto cartDto, HttpServletRequest request ){
+        // TODO: JwtUtil자체에서 해결하도록 해보자
+        Long memberId = requestMemberMapper.RequestToMemberId(request);
+        ApiResponse<List<CartDto>> result = cartService.addProduct(cartDto, memberId);
         return ResponseEntity.ok(result);
     }
 
     /**
      * [PATCH] 장바구니의 특정 상품 수량 변경
      * @param productId
-     * @param quantityChange "+", "-", "{수량}"
+     * @param sign "+", "-", "{수량}"
      * @param request 유저정보를 포함하고있는 HttpServletRequest
      * @return 장바구니 리스트
      */

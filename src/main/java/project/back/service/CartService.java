@@ -65,15 +65,15 @@ public class CartService {
 
     /**
      * 상품을 장바구니에 저장(등록)
-     * @param cartProductDto 카트에 담길 상품 정보
+     * @param cartDto 카트에 담길 상품 정보(productId를 가진 객체)
      * @param memberId 유저정보를 가져오기위한 memberId
-     * @return 등록된 Cart의 정보
+     * @return 장바구니 목록(CartDto)
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우
      * @throws ConflictException 같은 상품이 이미 담겨있는 경우
      */
-    public ApiResponse<CartProductDto> addProduct(CartProductDto cartProductDto, Long memberId){
+    public ApiResponse<List<CartDto>> addProduct(CartDto cartDto, Long memberId){
         Member member = getMemberByMemberId(memberId);
-        Product product = getProductByProductId(cartProductDto.getProductId());
+        Product product = getProductByProductId(cartDto.getProductId());
         // 이미 장바구니에 같은 상품이 담겨있는 경우
         cartRepository.findByMemberEqualsAndProductEquals(member, product)
                 .ifPresent(c -> {throw new ConflictException(CartErrorMessage.ALREADY_EXIST_PRODUCT.getMessage());});
@@ -84,16 +84,22 @@ public class CartService {
                 .quantity(FIRST_ADD_VALUE)
                 .build();
 
-        Cart result = cartRepository.save(cart);
+        cartRepository.save(cart);
 
-        CartProductDto cartProductDtoResult = CartProductDto.builder()
-                .productId(result.getProduct().getProductId())
-                .quantity(result.getQuantity())
-                .build();
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+                .map(c -> CartDto.builder()
+                        .productId(c.getProduct().getProductId())
+                        .productName(c.getProduct().getProductName())
+                        .productImgUrl(c.getProduct().getProductImgUrl())
+                        .quantity(c.getQuantity())
+                        .build()
+                )
+                .toList();
+
 
         return ApiResponse.success(
-                cartProductDtoResult,
-                String.format(CartSuccessMessage.SUCCESS_ADD_PRODUCT.getMessage(), product.getProductName())
+                cartDtos,
+                String.format(CartSuccessMessage.SUCCESS_ADD_PRODUCT.getMessage(), cart.getProduct().getProductName())
         );
     }
 
