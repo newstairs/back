@@ -7,5 +7,5 @@ import project.back.entity.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Optional<List<Product>> findAllByProductNameContaining(String productName);
+    List<Product> findAllByProductNameContaining(String productName);
 }

@@ -42,10 +42,8 @@ public class CartService {
      */
     public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
         //TODO: 그냥 List로 받아오게 수정하기(productRepository)
-        Optional<List<Product>> allByProductName = productRepository.findAllByProductNameContaining(productName);
-        log.info("productName: {}, allByProductName: {}", productName, allByProductName);
-
-        List<Product> products = allByProductName.get();
+        List<Product> products = productRepository.findAllByProductNameContaining(productName);
+        log.info("productName: {}, products: {}", productName, products);
 
         if(products.isEmpty()){
             throw new NoContentFoundException(
