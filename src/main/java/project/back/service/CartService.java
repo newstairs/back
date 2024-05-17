@@ -49,7 +49,7 @@ public class CartService {
                         .build()
                 )
                 .toList();
-        return ApiResponse.success(cartDtos, CartSuccessMessage.SUCCESS_GET.getMessage());
+        return ApiResponse.success(cartDtos, CartSuccessMessage.GET.getMessage());
     }
     /**
      * 상품 검색
@@ -75,7 +75,7 @@ public class CartService {
                         .build())
                 .toList();
 
-        return ApiResponse.success(ProductSearchDtos, CartSuccessMessage.SUCCESS_SEARCH.getMessage());
+        return ApiResponse.success(ProductSearchDtos, CartSuccessMessage.SEARCH.getMessage());
     }
 
     /**
@@ -114,7 +114,7 @@ public class CartService {
 
         return ApiResponse.success(
                 cartDtos,
-                String.format(CartSuccessMessage.SUCCESS_ADD_PRODUCT.getMessage(), cart.getProduct().getProductName())
+                String.format(CartSuccessMessage.ADD_PRODUCT.getMessage(), cart.getProduct().getProductName())
         );
     }
 
@@ -160,7 +160,7 @@ public class CartService {
                 .toList();
 
         return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.SUCCESS_UPDATE_CART.getMessage(), cart.getProduct().getProductName()));
+                String.format(CartSuccessMessage.UPDATE_CART.getMessage(), cart.getProduct().getProductName()));
     }
 
     // member 검증 및 객체가져오는 메서드
