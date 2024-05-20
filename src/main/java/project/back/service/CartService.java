@@ -36,7 +36,7 @@ public class CartService {
     /**
      * 장바구니 목록 조회
      *
-     * @param memberId 사용자정보
+     * @param memberId 사용자 고유번호
      * @return 장바구니 목록
      * @throws EntityNotFoundException 사용자정보를 찾을 수 없는경우
      */
@@ -54,7 +54,7 @@ public class CartService {
      *
      * @param productName 상품이름(String)
      * @return 상품이름을 포함하는 상품들(과 이미지)
-     * @throws NoContentFoundException productName을 포함하는 상품이 없는경우
+     * @throws NoContentFoundException productName 을 포함하는 상품이 없는경우
      */
     public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
         List<Product> products = productRepository.findAllByProductNameContaining(productName);
@@ -99,30 +99,26 @@ public class CartService {
                 .map(CartDto::CartToDto)
                 .toList();
 
-        return ApiResponse.success(
-                cartDtos,
-                String.format(CartSuccessMessage.ADD_PRODUCT.getMessage(), cart.getProduct().getProductName())
+        return ApiResponse.success(cartDtos,
+                String.format(CartSuccessMessage.ADD.getMessage(), cart.getProduct().getProductName())
         );
     }
 
     /**
      * 수량 수정
      *
-     * @param productId
+     * @param productId 상품 고유번호
      * @param sign      "+", "-", "숫자"
-     * @param memberId
+     * @param memberId  사용자 고유번호
      * @return 장바구니 목록(CartDto)
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
-     * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange에 이상한 값을 넣었을 경우
+     * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange 에 이상한 값을 넣었을 경우
      */
     @Transactional
     public ApiResponse<List<CartDto>> updateQuantity(Long productId, String sign, Long memberId) {
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(productId);
-
-        Cart cart = cartRepository.findByMemberEqualsAndProductEquals(member, product)
-                .orElseThrow(
-                        () -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
+        Cart cart = getCartByMemberAndProduct(member, product);
 
         if (sign.equals(quantityUpdateSign.MINUS.getValue())) {
             cart.minusQuantity();
@@ -144,7 +140,48 @@ public class CartService {
                 .toList();
 
         return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.UPDATE_CART.getMessage(), cart.getProduct().getProductName()));
+                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+    }
+
+    /**
+     * 장바구니 상품 삭제(개별)
+     *
+     * @param productId 상품 고유번호
+     * @param memberId  사용자 고유번호
+     * @return 장바구니 목록
+     * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
+     */
+    @Transactional
+    public ApiResponse<List<CartDto>> deleteProduct(Long productId, Long memberId) {
+        Member member = getMemberByMemberId(memberId);
+        Product product = getProductByProductId(productId);
+        Cart cart = getCartByMemberAndProduct(member, product);
+
+        cartRepository.delete(cart);
+
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+                .map(CartDto::CartToDto)
+                .toList();
+
+        return ApiResponse.success(cartDtos,
+                String.format(CartSuccessMessage.DELETE.getMessage(), cart.getProduct().getProductName()));
+    }
+
+    /**
+     * 장바구니 상품 삭제 (전체)
+     *
+     * @param memberId 사용자 고유번호
+     * @return 빈 장바구니 목록
+     * @throws EntityNotFoundException 사용자 정보를 찾을 수 없는 경우
+     */
+    @Transactional
+    public ApiResponse<List<CartDto>> deleteAllProduct(Long memberId) {
+        Member member = getMemberByMemberId(memberId);
+        cartRepository.deleteAllByMember(member);
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+                .map(CartDto::CartToDto)
+                .toList();
+        return ApiResponse.success(cartDtos, CartSuccessMessage.DELETE_ALL.getMessage());
     }
 
     // member 검증 및 객체가져오는 메서드
@@ -157,6 +194,13 @@ public class CartService {
     private Product getProductByProductId(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_FOUND_PRODUCT.getMessage()));
+    }
+
+    // Cart 검증 및 객체 가져오는 메서드
+    private Cart getCartByMemberAndProduct(Member member, Product product) {
+        return cartRepository.findByMemberEqualsAndProductEquals(member, product)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
     }
 
     // products 검즘 메서드

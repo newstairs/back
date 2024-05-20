@@ -21,4 +21,6 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     Optional<Cart> findByMemberEqualsAndProductEquals(Member member, Product product);
 
     List<Cart> findByMemberEquals(Member member);
+
+    void deleteAllByMember(Member member);
 }
