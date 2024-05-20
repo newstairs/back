@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,12 +29,23 @@ class CartServiceTest {
     @Autowired
     CartService cartService;
 
+    private Long commonMemberId;
+    private Long commonProductId;
+    private CartDto commonCartDto;
+
+    @BeforeEach
+    void setUp() {
+        commonMemberId = 1L;
+        commonProductId = 1L;
+        commonCartDto = CartDto.builder()
+                .productId(commonProductId)
+                .build();
+    }
+
     @Test
     @DisplayName("장바구니 조회 테스트")
     void 장바구니_조회_테스트() {
-        Long memberId = 1L;
-
-        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
+        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(commonMemberId);
 
         assertThat(result.getData()).isNotNull();
     }
@@ -78,15 +90,9 @@ class CartServiceTest {
     @DisplayName("상품추가 테스트")
     @Transactional
     void 상품추가_테스트() {
-        Long memberId = 1L;
-        Long productId = 1L;
-        CartDto cartDto = CartDto.builder()
-                .productId(productId)
-                .build();
-
-        ApiResponse<List<CartDto>> result = cartService.addProduct(cartDto, memberId);
+        ApiResponse<List<CartDto>> result = cartService.addProduct(commonCartDto, commonMemberId);
         CartDto addedProduct = result.getData().stream()
-                .filter(c -> c.getProductId() == productId)
+                .filter(c -> c.getProductId() == commonProductId)
                 .toList()
                 .get(0);
 
@@ -110,16 +116,9 @@ class CartServiceTest {
     @DisplayName("상품추가 예외테스트: 중복된 상품")
     @Transactional
     void 상품추가_예외테스트_중복된_상품_ConflictException() {
-        Long memberId = 1L;
-        Long productId = 1L;
+        cartService.addProduct(commonCartDto, commonMemberId); // 첫번째 저장
 
-        CartDto cartDto = CartDto.builder()
-                .productId(productId)
-                .build();
-
-        cartService.addProduct(cartDto, memberId); // 첫번째 저장
-
-        assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId)) // 두번째 저장 -> ConflictException
+        assertThatThrownBy(() -> cartService.addProduct(commonCartDto, commonMemberId)) // 두번째 저장 -> ConflictException
                 .isInstanceOf(ConflictException.class);
 
     }
@@ -129,16 +128,13 @@ class CartServiceTest {
     @CsvSource(value = {"+, 7", "-, 5", "5, 5"})
     @Transactional
     void 상품_수량_변경_테스트(String quantityChange, Long expected) {
-        Long memberId = 1L;
-        Long productId = 1L;
+        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
+        cartService.updateQuantity(commonProductId, "6", commonMemberId); // 6개로 세팅
 
-        CartDto cartDto = CartDto.builder().productId(productId).build();
-        cartService.addProduct(cartDto, memberId); // 장바구니에 1L인 상품추가
-        cartService.updateQuantity(memberId, "6", productId); // 6개로 세팅
-
-        ApiResponse<List<CartDto>> response = cartService.updateQuantity(productId, quantityChange, memberId);
+        ApiResponse<List<CartDto>> response = cartService.updateQuantity(commonProductId, quantityChange,
+                commonMemberId);
         Long result = response.getData().stream()
-                .filter(c -> c.getProductId() == productId)
+                .filter(c -> c.getProductId() == commonProductId)
                 .toList()
                 .get(0).getQuantity();
 
@@ -150,13 +146,9 @@ class CartServiceTest {
     @DisplayName("상품 수량 변경 예외 테스트: -한 값이 0인 경우, 직접입력한 값이 0인 경우, 직접입력한값이 적절하지 않은 경우")
     @Transactional
     void 상품_수량_변경_예외_테스트_IllegalArgumentException(String quantityChange) {
-        Long memberId = 1L;
-        Long productId = 1L;
+        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가, quantity=1
 
-        CartDto cartDto = CartDto.builder().productId(productId).build();
-        cartService.addProduct(cartDto, memberId); // 장바구니에 1L인 상품추가, quantity=1
-
-        assertThatThrownBy(() -> cartService.updateQuantity(productId, quantityChange, memberId))
+        assertThatThrownBy(() -> cartService.updateQuantity(commonProductId, quantityChange, commonMemberId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -173,13 +165,10 @@ class CartServiceTest {
     @DisplayName("(개별)상품 삭제 테스트")
     @Transactional
     void 개별_상품_삭제_테스트() {
-        Long memberId = 1L;
-        Long productId = 1L;
-        CartDto cartDto = CartDto.builder().productId(productId).build();
-        cartService.addProduct(cartDto, memberId);
-        int beforeSize = cartService.getCartsByMemberId(memberId).getData().size();
+        cartService.addProduct(commonCartDto, commonMemberId);
+        int beforeSize = cartService.getCartsByMemberId(commonMemberId).getData().size();
 
-        int afterSize = cartService.deleteProduct(productId, memberId).getData().size();
+        int afterSize = cartService.deleteProduct(commonProductId, commonMemberId).getData().size();
 
         assertThat(afterSize).isEqualTo(beforeSize - 1);
     }
@@ -188,20 +177,15 @@ class CartServiceTest {
     @DisplayName("(개별)상품 삭제 예외 테스트")
     @Transactional
     void 개별_상품_삭제_예외_테스트_EntityNotFoundException() {
-        Long memberId = 1L;
-        Long productId = 1L;
-
-        assertThatThrownBy(() -> cartService.deleteProduct(memberId, productId)).isInstanceOf(
-                EntityNotFoundException.class);
+        assertThatThrownBy(() -> cartService.deleteProduct(commonProductId, commonMemberId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     @DisplayName("(전체)상품 삭제 테스트")
     @Transactional
-    void 전체_상품_삭제_테스트(){
-        Long memberId = 1L;
-
-        int resultSize = cartService.deleteAllProduct(memberId).getData().size();
+    void 전체_상품_삭제_테스트() {
+        int resultSize = cartService.deleteAllProduct(commonMemberId).getData().size();
 
         assertThat(resultSize).isEqualTo(0);
     }
