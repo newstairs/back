@@ -141,7 +141,6 @@ class CartServiceTest {
                 .filter(c -> c.getProductId() == productId)
                 .toList()
                 .get(0).getQuantity();
-        System.out.println("result = " + result + ", expected = " + expected);
 
         assertThat(result).isEqualTo(expected);
     }

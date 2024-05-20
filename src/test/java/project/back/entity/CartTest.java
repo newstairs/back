@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CartTest {
 
@@ -22,6 +25,12 @@ class CartTest {
 
         assertThat(cart.getQuantity()).isEqualTo(1L);
     }
+    @Test
+    @DisplayName("수량 감소 예외 테스트")
+    void 수량_감소_예외_테스트_IllegalArgumentException(){
+        cart.minusQuantity();
+        assertThatThrownBy(() -> cart.minusQuantity()).isInstanceOf(IllegalArgumentException.class);
+    }
 
     @Test
     @DisplayName("수량 증가 테스트")
@@ -31,13 +40,20 @@ class CartTest {
         assertThat(cart.getQuantity()).isEqualTo(3L);
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {"1,1", "5,5", "6,6"})
     @DisplayName("수량 직접입력 테스트")
-    void 수량_직접입력_테스트(){
-        Long changeQauntity = 5L;
+    void 수량_직접입력_테스트(Long qunatity, Long expected){
+        cart.updateQuantity(qunatity);
 
-        cart.updateQuantity(changeQauntity);
+        assertThat(cart.getQuantity()).isEqualTo(expected);
+    }
 
-        assertThat(cart.getQuantity()).isEqualTo(5L);
+    @ParameterizedTest
+    @ValueSource(longs = {0, -1})
+    @DisplayName("수량 직접입력 예외 테스트")
+    void 수량_직접입력_예외_테스트_IllegalArgumentException(Long quantity){
+
+        assertThatThrownBy(() -> cart.updateQuantity(quantity)).isInstanceOf(IllegalArgumentException.class);
     }
 }
