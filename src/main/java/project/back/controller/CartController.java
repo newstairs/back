@@ -51,7 +51,7 @@ public class CartController {
 
     /**
      * [POST] 장바구니에 상품추가
-     * @param cartProductDto (productId)
+     * @param cartDto (productId)
      * @param request 유저정보를 포함하고있는 HttpServletRequest
      * @return 저장된 상품에 대한 객체(productId, quantity)와 상품이름
      */
