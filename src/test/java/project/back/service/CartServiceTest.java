@@ -30,7 +30,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("장바구니 조회 테스트")
-    void 장바구니_조회_테스트(){
+    void 장바구니_조회_테스트() {
         Long memberId = 1L;
 
         ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
@@ -40,7 +40,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("장바구니 조회 예외 테스트")
-    void 장바구니_조회_예외_테스트_EntityNotFoundException(){
+    void 장바구니_조회_예외_테스트_EntityNotFoundException() {
         Long memberId = 1000L;
 
         assertThatThrownBy(() -> cartService.getCartsByMemberId(memberId))
@@ -50,7 +50,7 @@ class CartServiceTest {
     @Test
     @DisplayName("상품검색테스트")
     @Transactional
-    void 재료검색테스트(){
+    void 재료검색테스트() {
         String testProductName = "이준오의 당근";
         Product product1 = new Product(testProductName, "temp");
         productRepository.save(product1);
@@ -67,7 +67,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("상품검색 예외테스트")
-    void 상품검색_예외테스트(){
+    void 상품검색_예외테스트() {
         String productName = "상품이름검색 ㅋㅋ 이런 상품은 없겠지";
 
         assertThatThrownBy(() -> cartService.findAllByProductName(productName))
@@ -77,7 +77,7 @@ class CartServiceTest {
     @Test
     @DisplayName("상품추가 테스트")
     @Transactional
-    void 상품추가_테스트(){
+    void 상품추가_테스트() {
         Long memberId = 1L;
         Long productId = 1L;
         CartDto cartDto = CartDto.builder()
@@ -96,7 +96,7 @@ class CartServiceTest {
     @ParameterizedTest
     @CsvSource(value = {"1000,1", "1,10000"})
     @DisplayName("상품추가 예외테스트: 사용자 없음(1000), 상품 없음(10000) ")
-    void 상품추가_예외테스트_EntityNotFoundException(Long memberId, Long productId){
+    void 상품추가_예외테스트_EntityNotFoundException(Long memberId, Long productId) {
         CartDto cartDto = CartDto.builder()
                 .productId(productId)
                 .build();
@@ -109,7 +109,7 @@ class CartServiceTest {
     @Test
     @DisplayName("상품추가 예외테스트: 중복된 상품")
     @Transactional
-    void 상품추가_예외테스트_중복된_상품_ConflictException(){
+    void 상품추가_예외테스트_중복된_상품_ConflictException() {
         Long memberId = 1L;
         Long productId = 1L;
 
@@ -128,7 +128,7 @@ class CartServiceTest {
     @DisplayName("상품 수량 변경 테스트")
     @CsvSource(value = {"+, 7", "-, 5", "5, 5"})
     @Transactional
-    void 상품_수량_변경_테스트(String quantityChange, Long expected){
+    void 상품_수량_변경_테스트(String quantityChange, Long expected) {
         Long memberId = 1L;
         Long productId = 1L;
 
@@ -149,7 +149,7 @@ class CartServiceTest {
     @ValueSource(strings = {"-", "0", " ", ""})
     @DisplayName("상품 수량 변경 예외 테스트: -한 값이 0인 경우, 직접입력한 값이 0인 경우, 직접입력한값이 적절하지 않은 경우")
     @Transactional
-    void 상품_수량_변경_예외_테스트_IllegalArgumentException(String quantityChange){
+    void 상품_수량_변경_예외_테스트_IllegalArgumentException(String quantityChange) {
         Long memberId = 1L;
         Long productId = 1L;
 
@@ -167,5 +167,42 @@ class CartServiceTest {
     void 상품_수량_변경_예외_테스트_EntityNotFoundException(Long memberId, Long productId, String quantityChange) {
         assertThatThrownBy(() -> cartService.updateQuantity(productId, quantityChange, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("(개별)상품 삭제 테스트")
+    @Transactional
+    void 개별_상품_삭제_테스트() {
+        Long memberId = 1L;
+        Long productId = 1L;
+        CartDto cartDto = CartDto.builder().productId(productId).build();
+        cartService.addProduct(cartDto, memberId);
+        int beforeSize = cartService.getCartsByMemberId(memberId).getData().size();
+
+        int afterSize = cartService.deleteProduct(productId, memberId).getData().size();
+
+        assertThat(afterSize).isEqualTo(beforeSize - 1);
+    }
+
+    @Test
+    @DisplayName("(개별)상품 삭제 예외 테스트")
+    @Transactional
+    void 개별_상품_삭제_예외_테스트_EntityNotFoundException() {
+        Long memberId = 1L;
+        Long productId = 1L;
+
+        assertThatThrownBy(() -> cartService.deleteProduct(memberId, productId)).isInstanceOf(
+                EntityNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("(전체)상품 삭제 테스트")
+    @Transactional
+    void 전체_상품_삭제_테스트(){
+        Long memberId = 1L;
+
+        int resultSize = cartService.deleteAllProduct(memberId).getData().size();
+
+        assertThat(resultSize).isEqualTo(0);
     }
 }
