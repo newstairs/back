@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -42,16 +43,9 @@ dependencies {
 
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1'
-	//암호화
-	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
 
 	// macOS
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.109.Final:osx-aarch_64'
-}
-
-test {
-	useJUnitPlatform()
-	systemProperty "jasypt.encryptor.password", project.getProperties().get("jasypt.encryptor.password")
 }
 
 tasks.named('test') {

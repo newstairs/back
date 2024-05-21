@@ -31,7 +31,7 @@ public class MartProduct {
     @JoinColumn(name="mart_id")
     private Mart mart;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name="discount_id")
     private Discount discount;
 

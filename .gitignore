@@ -36,3 +36,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### MAC ###
+.DS_Store
+
+### 설정파일 ###
+application.yml
+application-local.yml
