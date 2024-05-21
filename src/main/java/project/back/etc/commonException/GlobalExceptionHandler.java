@@ -81,4 +81,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<String>> handleNoContentFoundException(NoContentFoundException ex) {
         return new ResponseEntity<>(ApiResponse.fail(ex.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+    /**
+     * 사용자 정의 예외 클래스
+     * 데이터가 이미 존재하여 중복되는 값일 때 발생
+     * HTTP 409 Conflict
+     */
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiResponse<String>> handleConflictException(ConflictException ex) {
+        return new ResponseEntity<>(ApiResponse.fail(ex.getMessage()), HttpStatus.CONFLICT);
+    }
 }
