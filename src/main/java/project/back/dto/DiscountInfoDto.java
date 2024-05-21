@@ -1,6 +1,5 @@
 package project.back.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +8,6 @@ import java.math.RoundingMode;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class DiscountInfoDto {
     private Long productId;
     private String productName;

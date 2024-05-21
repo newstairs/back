@@ -11,7 +11,10 @@ import java.util.List;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    @Query("SELECT new project.back.dto.CartProductDto(c.quantity, c.member.memberId, c.product.productId) " +
-            "FROM Cart c WHERE c.member.memberId = :memberId")
+    @Query("""
+           SELECT new project.back.dto.CartProductDto(c.quantity, c.member.memberId, c.product.productId)
+           FROM Cart c 
+           WHERE c.member.memberId = :memberId
+           """)
     List<CartProductDto> findCartsByMemberMemberId(Long memberId);
 }
