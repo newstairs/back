@@ -1,28 +1,26 @@
 package project.back.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Mart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mart_id")
     private Long id;
 
-    @Column(name = "mart_name")
+    @Column(name = "mart_name", nullable = false)
     private String martName;
 
-    @Column(name = "mart_address")
+    @Column(name = "mart_address", nullable = false)
     private String martAddress;
 
-    /* 더미 데이터 삽입에 사용 */
-    public Mart(String martName, String martAddress) {
-        this.martName = martName;
-        this.martAddress = martAddress;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "join_id")
+    private JoinMart joinMart;
 }

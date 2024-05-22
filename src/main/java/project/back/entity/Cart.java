@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 @Entity
 @Table(name = "cart")
@@ -30,11 +28,4 @@ public class Cart {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_id")
     private Product product;
-
-    /* 더미 데이터 삽입에 사용 */
-    public Cart(Long quantity, Member member, Product product) {
-        this.quantity = quantity;
-        this.member = member;
-        this.product = product;
-    }
 }
