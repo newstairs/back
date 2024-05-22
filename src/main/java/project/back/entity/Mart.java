@@ -1,6 +1,7 @@
 package project.back.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ public class Mart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mart_id")
-    private Long martId;
+    private Long id;
 
     @Column(name = "mart_name")
     private String martName;
