@@ -1,7 +1,6 @@
 package project.back.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,7 @@ import org.springframework.util.StreamUtils;
 import project.back.dto.ApiResponse;
 import project.back.dto.ProductDto;
 import project.back.entity.Product;
+import project.back.etc.martproduct.MartAndProductMessage;
 import project.back.repository.ProductRepository;
 
 import java.io.IOException;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -33,8 +32,7 @@ public class ProductService {
             List<ProductDto> productDto = productRepository.findAll().stream()
                 .map(this::convertToProductDto)
                 .collect(Collectors.toList());
-        log.info("마트 상품 Loaded: {}", productDto.size());
-        return ApiResponse.success(productDto, "상품 목록을 성공적으로 불러왔습니다.");
+        return ApiResponse.success(productDto, MartAndProductMessage.LOADED_PRODUCT.getMessage());
     }
 
     /** 이미지를 Base64로 인코딩하고, ProductDto로 반환 */
@@ -56,12 +54,12 @@ public class ProductService {
                 new ClassPathResource("static/images" + (imagePath != null ? imagePath : "/null.png"));
         try {
             if (!resource.exists()) {
-                throw new RuntimeException("이미지를 찾을 수 없습니다.");
+                throw new RuntimeException(MartAndProductMessage.NOT_FOUND_PRODUCT_IMG.getMessage());
             }
             byte[] imageData = StreamUtils.copyToByteArray(resource.getInputStream());
             return Base64.getEncoder().encodeToString(imageData);
         } catch (IOException e) {
-            throw new RuntimeException("이미지 파일 처리 중 오류가 발생했습니다.");
+            throw new RuntimeException(MartAndProductMessage.ERROR_PRODUCT_IMG_PROCESSING.getMessage());
         }
     }
 }
