@@ -1,4 +1,4 @@
-package project.back.etc.enums.cart;
+package project.back.etc.cart.enums;
 
 public enum CartErrorMessage {
     // search

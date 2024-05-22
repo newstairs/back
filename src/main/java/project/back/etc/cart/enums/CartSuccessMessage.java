@@ -1,4 +1,4 @@
-package project.back.etc.enums.cart;
+package project.back.etc.cart.enums;
 
 public enum CartSuccessMessage {
     GET("장바구니 조회에 성공했습니다."),

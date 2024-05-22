@@ -40,8 +40,7 @@ public class CartController {
     public ResponseEntity<ApiResponse<List<CartDto>>> getCart(HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
 
-        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(cartService.getCartsByMemberId(memberId));
     }
 
     /**
@@ -53,8 +52,7 @@ public class CartController {
     @GetMapping("/{productName}")
     public ResponseEntity<ApiResponse<List<ProductSearchDto>>> findAllByProductName(@PathVariable String productName) {
 
-        ApiResponse<List<ProductSearchDto>> result = cartService.findAllByProductName(productName);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(cartService.findAllByProductName(productName));
     }
 
     /**
@@ -66,11 +64,12 @@ public class CartController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<List<CartDto>>> addProduct(
-            @RequestBody CartDto cartDto, HttpServletRequest request) {
+            @RequestBody CartDto cartDto,
+            HttpServletRequest request) {
         // TODO: JwtUtil 자체에서 해결하도록 해보자
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.addProduct(cartDto, memberId);
-        return ResponseEntity.ok(result);
+
+        return ResponseEntity.ok(cartService.addProduct(cartDto, memberId));
     }
 
     /**
@@ -85,8 +84,8 @@ public class CartController {
             @PathVariable Long productId,
             HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.plusQuantity(productId, memberId);
-        return ResponseEntity.ok(result);
+
+        return ResponseEntity.ok(cartService.plusQuantity(productId, memberId));
     }
 
     /**
@@ -101,8 +100,8 @@ public class CartController {
             @PathVariable Long productId,
             HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.minusQuantity(productId, memberId);
-        return ResponseEntity.ok(result);
+
+        return ResponseEntity.ok(cartService.minusQuantity(productId, memberId));
     }
 
     /**
@@ -118,8 +117,8 @@ public class CartController {
             @PathVariable Long productId,
             HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.updateQuantity(productId, count, memberId);
-        return ResponseEntity.ok(result);
+
+        return ResponseEntity.ok(cartService.updateQuantity(productId, count, memberId));
     }
 
     /**
@@ -130,12 +129,12 @@ public class CartController {
      * @return 장바구니 목록
      */
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> deleteProduct(@PathVariable Long productId,
-                                                                    HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<List<CartDto>>> deleteProduct(
+            @PathVariable Long productId,
+            HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.deleteProduct(productId, memberId);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(cartService.deleteProduct(productId, memberId));
     }
 
     /**
@@ -147,8 +146,7 @@ public class CartController {
     @DeleteMapping
     public ResponseEntity<ApiResponse<List<CartDto>>> deleteAllProduct(HttpServletRequest request) {
         Long memberId = requestMemberMapper.RequestToMemberId(request);
-        ApiResponse<List<CartDto>> result = cartService.deleteAllProduct(memberId);
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(cartService.deleteAllProduct(memberId));
     }
 }

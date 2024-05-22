@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({"success", "message","data"})
 public class ApiResponse<T> implements Serializable {
 
