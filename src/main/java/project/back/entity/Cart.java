@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import project.back.etc.enums.cart.CartErrorMessage;
+import project.back.etc.cart.enums.CartErrorMessage;
 
 
 @Entity

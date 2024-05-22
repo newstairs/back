@@ -2,7 +2,6 @@ package project.back.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,9 +14,8 @@ import project.back.entity.Member;
 import project.back.entity.Product;
 import project.back.etc.commonException.ConflictException;
 import project.back.etc.commonException.NoContentFoundException;
-import project.back.etc.enums.cart.CartErrorMessage;
-import project.back.etc.enums.cart.CartSuccessMessage;
-import project.back.etc.enums.cart.quantityUpdateSign;
+import project.back.etc.cart.enums.CartErrorMessage;
+import project.back.etc.cart.enums.CartSuccessMessage;
 import project.back.repository.CartRepository;
 import project.back.repository.ProductRepository;
 import project.back.repository.memberrepository.MemberRepository;
@@ -67,7 +65,6 @@ public class CartService {
 
         return ApiResponse.success(ProductSearchDtos, CartSuccessMessage.SEARCH.getMessage());
     }
-
     /**
      * 상품을 장바구니에 저장(등록)
      *
@@ -82,10 +79,7 @@ public class CartService {
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(cartDto.getProductId());
 
-        cartRepository.findByMemberEqualsAndProductEquals(member, product)
-                .ifPresent(c -> {
-                    throw new ConflictException(CartErrorMessage.ALREADY_EXIST_PRODUCT.getMessage());
-                });
+        checkAlreadyExist(member, product);
 
         Cart cart = Cart.builder()
                 .product(product)
@@ -103,46 +97,74 @@ public class CartService {
                 String.format(CartSuccessMessage.ADD.getMessage(), cart.getProduct().getProductName())
         );
     }
-
     /**
-     * 수량 수정
+     * 상품 수량 변경(직접입력)
      *
      * @param productId 상품 고유번호
-     * @param sign      "+", "-", "숫자"
      * @param memberId  사용자 고유번호
      * @return 장바구니 목록(CartDto)
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
-     * @throws IllegalArgumentException "-"한 값이 0일 경우, "직접입력"한 값이 0이하인 경우, quantityChange 에 이상한 값을 넣었을 경우
+     * @throws IllegalArgumentException "직접입력"한 값이 1보다 작은 경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> updateQuantity(Long productId, String sign, Long memberId) {
-        Member member = getMemberByMemberId(memberId);
-        Product product = getProductByProductId(productId);
-        Cart cart = getCartByMemberAndProduct(member, product);
+    public ApiResponse<List<CartDto>> updateQuantity(Long productId, Long count, Long memberId) {
+        Cart cart = getCartByMemberIdAndProductId(memberId, productId);
 
-        if (sign.equals(quantityUpdateSign.MINUS.getValue())) {
-            cart.minusQuantity();
-        }
-        if (sign.equals(quantityUpdateSign.PLUS.getValue())) {
-            cart.plusQuantity();
-        }
-        if (!sign.equals(quantityUpdateSign.MINUS.getValue()) && !sign.equals(quantityUpdateSign.PLUS.getValue())) {
-            Long quantity = Optional.ofNullable(sign)
-                    .map(Long::parseLong)
-                    .orElseThrow(() -> new IllegalArgumentException(CartErrorMessage.INVALID_QUANTITY.getMessage()));
-            cart.updateQuantity(quantity);
-        }
-
+        cart.updateQuantity(count);
         cartRepository.save(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
                 .map(CartDto::CartToDto)
                 .toList();
 
         return ApiResponse.success(cartDtos,
                 String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
     }
+    /**
+     * 상품 수량 변경(증가)
+     *
+     * @param productId 상품 고유번호
+     * @param memberId  사용자 고유번호
+     * @return 장바구니 목록(CartDto)
+     * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
+     */
+    @Transactional
+    public ApiResponse<List<CartDto>> plusQuantity(Long productId, Long memberId) {
+        Cart cart = getCartByMemberIdAndProductId(memberId, productId);
 
+        cart.plusQuantity();
+        cartRepository.save(cart);
+
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
+                .map(CartDto::CartToDto)
+                .toList();
+
+        return ApiResponse.success(cartDtos,
+                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+    }
+    /**
+     * 상품 수량 변경(감소)
+     *
+     * @param productId 상품 고유번호
+     * @param memberId  사용자 고유번호
+     * @return 장바구니 목록(CartDto)
+     * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
+     * @throws IllegalArgumentException "-"한 값이 0이하인 경우
+     */
+    @Transactional
+    public ApiResponse<List<CartDto>> minusQuantity(Long productId, Long memberId) {
+        Cart cart = getCartByMemberIdAndProductId(memberId, productId);
+
+        cart.minusQuantity();
+        cartRepository.save(cart);
+
+        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
+                .map(CartDto::CartToDto)
+                .toList();
+
+        return ApiResponse.success(cartDtos,
+                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+    }
     /**
      * 장바구니 상품 삭제(개별)
      *
@@ -202,12 +224,25 @@ public class CartService {
                 .orElseThrow(
                         () -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
     }
-
-    // products 검즘 메서드
+    // member, product, cart를 검증 및 객체를 가져오는 메서드
+    private Cart getCartByMemberIdAndProductId(Long memberId, Long productId){
+        Member member = getMemberByMemberId(memberId);
+        Product product = getProductByProductId(productId);
+        Cart cart = getCartByMemberAndProduct(member, product);
+        return cart;
+    }
+    // products 검증 메서드
     private void validateProducts(String productName, List<Product> products) {
         if (products.isEmpty()) {
             throw new NoContentFoundException(
                     String.format(CartErrorMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
         }
+    }
+    // addProduct 시 이미 cart 에 존재하는 객체인지 검증하는 메서드
+    private void checkAlreadyExist(Member member, Product product) {
+        cartRepository.findByMemberEqualsAndProductEquals(member, product)
+                .ifPresent(c -> {
+                    throw new ConflictException(CartErrorMessage.ALREADY_EXIST_PRODUCT.getMessage());
+                });
     }
 }
