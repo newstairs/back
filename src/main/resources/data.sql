@@ -1276,6 +1276,21 @@ FROM mart_info mi
          JOIN join_mart jm ON mi.store = jm.store
 WHERE mi.store LIKE 'GS%';
 
+/* 상품 이미지 추가 */
+UPDATE product SET product_img_url = '/carrot.jpeg' WHERE product_name = '당근(흙당근, 100g)';
+UPDATE product SET product_img_url = '/redPepperPaste.jpeg' WHERE product_name = '해찬들 우리쌀태양초 고추장(1kg)';
+UPDATE product SET product_img_url = '/soySauce.jpeg' WHERE product_name = '양조간장 501(500ml)';
+UPDATE product SET product_img_url = '/sugar.jpeg' WHERE product_name = '백설 하얀설탕(1kg)';
+UPDATE product SET product_img_url = '/fishCake.jpeg' WHERE product_name = '삼호 안심 부산어묵(400g)';
+UPDATE product SET product_img_url = '/potato.jpeg' WHERE product_name = '감자(껍질 있는 감자, 100g)';
+UPDATE product SET product_img_url = '/sweetPotato.jpeg' WHERE product_name = '고구마(껍질 있는 밤고구마, 100g)';
+UPDATE product SET product_img_url = '/scallions.jpeg' WHERE product_name = '쪽파(흙쪽파)';
+UPDATE product SET product_img_url = '/onion.jpeg' WHERE product_name = '양파(껍질 있는 망포장, 1.5kg)';
+UPDATE product SET product_img_url = '/garlic.jpeg' WHERE product_name = '마늘(깐마늘, 100g)';
+UPDATE product SET product_img_url = '/freetime.jpeg' WHERE product_name = '자유시간(36g)';
+UPDATE product SET product_img_url = '/io.jpeg' WHERE product_name = '이오(5개)';
+UPDATE product SET product_img_url = '/noodles.jpeg' WHERE product_name = '옛날 자른당면(300g)';
+
 /* discount 생성 */
 INSERT INTO discount (discount_rate)
 VALUES  (10.5),

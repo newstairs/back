@@ -22,10 +22,4 @@ public class Product {
 
     @Column(nullable = true)
     private String productImgUrl;
-
-    /* 더미 데이터 삽입에 사용 */
-    public Product(String productName, String productImgUrl) {
-        this.productName = productName;
-        this.productImgUrl = productImgUrl;
-    }
 }
