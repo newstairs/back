@@ -1,16 +1,20 @@
 package project.back.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import net.minidev.json.JSONUtil;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,15 +26,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 import project.back.dto.ApiResponse;
 import project.back.dto.MemberDto;
 import project.back.entity.Member;
-import project.back.etc.aboutlogin.Access_code;
-import project.back.etc.aboutlogin.JwtToken;
-import project.back.etc.aboutlogin.JwtUtill;
+import project.back.etc.aboutlogin.*;
+import project.back.etc.aboutlogin.apitestclass.FriendDataDto;
+import project.back.etc.aboutlogin.apitestclass.FriendDataObject;
+import project.back.etc.aboutlogin.apitestclass.GptTEST;
 import project.back.etc.aboutlogin.exception.TokenSending;
 import project.back.repository.memberrepository.MemberRepository;
 import project.back.service.memberservice.MemberService;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Controller
 @Slf4j
@@ -65,14 +73,14 @@ public class LoginController {
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
-        MultiValueMap<String, String> accessTokenParams = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
-       MultiValueMap<String, String> accessTokenRequest = accessTokenParams;
+        MultiValueMap<String, String> accessTokenParam = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
+        //MultiValueMap<String, String> accessTokenRequest = accessTokenParam;
         String answerfromapi=webClient.mutate()
                 .baseUrl(tokenuri)
                 .defaultHeader("Content-type","application/x-www-form-urlencoded;charset=utf-8")
                 .build()
                 .post()
-                .body(BodyInserters.fromFormData(accessTokenRequest))
+                .body(BodyInserters.fromFormData(accessTokenParam))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -97,7 +105,7 @@ public class LoginController {
 
         JSONObject properties = (JSONObject) profile.get("properties");
 
-        System.out.println(properties);
+
 
 
         JSONObject kakao_account = (JSONObject) profile.get("kakao_account");
@@ -111,6 +119,17 @@ public class LoginController {
         Optional<Member> member=memberService.finbdyemail(email);
 
         List<Object> tokendata=gettokenandresponse(email,userName,member);
+
+        if(redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",(Long)tokendata.get(1)))==null){
+
+            redisTemplate.opsForValue().set(String.format("member_kakao_token_%d",(Long)tokendata.get(1)),jsonObject.get("access_token")
+                    ,1000, TimeUnit.SECONDS);
+        }
+        else{
+            redisTemplate.opsForValue().set(String.format("member_kakao_token_%d",(Long)tokendata.get(1)),jsonObject.get("access_token"));
+        }
+
+
         ApiResponse.success((String)tokendata.get(0),"로그인 성공");
         return new ResponseEntity<>( ApiResponse.success((String)tokendata.get(0),"로그인 성공"), HttpStatus.OK);
     }
@@ -165,8 +184,106 @@ public class LoginController {
     }
 
 
-}
+    @GetMapping("/returnfriendlist")
+    public ResponseEntity<ApiResponse> friendlist(HttpServletRequest req){
+        String token=req.getHeader("Authorization").substring(7);
+        Long id=jwtUtill.getidfromtoken(token);
+        String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
 
+
+        FriendDataObject friend_data=webClient.mutate()
+                .baseUrl("https://kapi.kakao.com/v1/api/talk/friends")
+                .defaultHeader("Content-Type","application/x-www-form-urlencoded")
+                .defaultHeader("Authorization",String.format("Bearer %s",kakao_token))
+                .build()
+                .get()
+                .retrieve()
+                .bodyToMono(FriendDataObject.class)
+                .block();
+
+        return new ResponseEntity<>(ApiResponse.success(friend_data,"친구데이터 전송"),HttpStatus.OK);
+
+    }
+
+
+    @GetMapping("/sendmsgtofriend")
+    public void sendmsgfriend(@RequestBody FriendDataDto friendDataDto, HttpServletRequest req) throws JsonProcessingException {
+        ObjectMapper objectMapper=new ObjectMapper();
+        String token=req.getHeader("Authorization").substring(7);
+        Long id=jwtUtill.getidfromtoken(token);
+        List<String> friend_uuid=friendDataDto.getFriend_uuid();
+        String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
+        /*String x=webClient.mutate()
+                .baseUrl("https://kapi.kakao.com/v2/api/talk/memo/default/send")
+                .defaultHeader("Content-Type","application/x-www-form-urlencoded")
+                .defaultHeader("Authorization",String.format("Bearer %s",kakao_token))
+                .build()
+                .post()
+                .body(BodyInserters.fromValue())
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        */
+
+
+    }
+    @GetMapping("/kogpt")
+    @ResponseBody
+    public String gpt() throws JsonProcessingException, ParseException {
+        GptTEST gptTEST=new GptTEST("주어진 음식들의 재료를 제공해주세요. \n\n 음식:새우 볶음밥 \n재료:새우,밥,식용유,당근,양파,계란,파\n\n 음식:자장면 \n재료:면,춘장,양파,파,돼지고기 앞다리살\n\n 음식:김치\n재료:소금,멸치 액젓,배추,고추가루,참기름,설탕\n\n 음식:알리오올리오\n재료:마늘,올리브오일,파스타 면,생크림,파마산치즈,후추,바질\n\n음식:된장 찌개\n재료:된장,두부,감자,호박,양파,청량고추,대파,다진 마늘\n\n 음식:새우 튀김\n재료:''" ,20L,1L,0.1f);
+        ObjectMapper objectMapper=new ObjectMapper();
+        //log.info("json변환꼴 :{}",objectMapper.writeValueAsString(gptTEST));
+        //List<SettingFor> seeting=new ArrayList<>();
+        //seeting.add(new SettingFor("user","Say this is a test!"));
+        //Gptest gptest=new Gptest("gpt-3.5-turbo",seeting,0.7f);
+        //log.info("gptest:{}",gptest);
+        /*String data=webClient.mutate()
+                .baseUrl("https://api.openai.com/v1/chat/completions")
+                .defaultHeader("Authorization",)
+                .defaultHeader("Content-Type","application/json")
+                .build()
+                .post()
+                .body(BodyInserters.fromValue(objectMapper.writeValueAsString(gptest)))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();*/
+
+
+
+
+        String data=webClient.mutate()
+                .baseUrl("https://api.kakaobrain.com/v1/inference/kogpt/generation")
+
+                .defaultHeader("Content-Type","application/json")
+                .build()
+                .post()
+                .body(BodyInserters.fromValue(objectMapper.writeValueAsString(gptTEST)))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        /*String data=webClient.mutate()
+                .baseUrl("https://dapi.kakao.com/v2/local/search/address.json?query=서울")
+                .defaultHeader("Authorization",String.format("KakaoAK %s",))
+                .build()
+                .get()
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();*/
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(data);
+        log.info("data:{}",data);
+        return (String) ((JSONObject) ((JSONArray) jsonObject.get("generations")).get(0)).get("text");
+        //return "ok";
+
+    }
+
+
+
+
+
+
+}
 
 
 
