@@ -34,6 +34,7 @@ import project.back.etc.aboutlogin.exception.TokenSending;
 import project.back.repository.memberrepository.MemberRepository;
 import project.back.service.memberservice.MemberService;
 import reactor.core.publisher.Mono;
+import reactor.netty.transport.ProxyProvider;
 
 import java.io.IOException;
 import java.util.*;
@@ -75,7 +76,8 @@ public class LoginController {
         String code=access_code.getAccess_code();
         MultiValueMap<String, String> accessTokenParam = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
         //MultiValueMap<String, String> accessTokenRequest = accessTokenParam;
-        String answerfromapi=webClient.mutate()
+        String answerfromapi=webClient
+                .mutate()
                 .baseUrl(tokenuri)
                 .defaultHeader("Content-type","application/x-www-form-urlencoded;charset=utf-8")
                 .build()
@@ -86,6 +88,8 @@ public class LoginController {
                 .block();
 
 
+
+        //받아온 데이터를 파싱하기. access_token을 받아오는 과정.
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(answerfromapi);
 
@@ -116,10 +120,21 @@ public class LoginController {
         String user_profile_image=(String) properties.get("profile_image");
 
 
+
+        //애같은 경우 이메일로 이미 가입한 멤버인지 체크 하는 과정.
         Optional<Member> member=memberService.finbdyemail(email);
 
+
+        /*
+        멤버가 있을경우 db에 다시저장하는 과정을 스킵하고 없으면 db 저장
+        */
         List<Object> tokendata=gettokenandresponse(email,userName,member);
 
+
+        /*
+
+        * 레디스에 멤버 아이디로 저장되는 access_tokend이 존재시
+        값을 지우고 다시저장 즉 최신화 없다면 최초저장.*/
         if(redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",(Long)tokendata.get(1)))==null){
 
             redisTemplate.opsForValue().set(String.format("member_kakao_token_%d",(Long)tokendata.get(1)),jsonObject.get("access_token")
