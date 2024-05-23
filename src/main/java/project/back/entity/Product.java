@@ -22,4 +22,9 @@ public class Product {
 
     @Column(nullable = true)
     private String productImgUrl;
+
+    public Product(String productName, String productImgUrl) {
+        this.productName = productName;
+        this.productImgUrl = productImgUrl;
+    }
 }
