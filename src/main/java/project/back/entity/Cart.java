@@ -1,11 +1,12 @@
 package project.back.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import project.back.etc.cart.enums.CartErrorMessage;
 
 
 @Entity
@@ -13,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,5 +37,25 @@ public class Cart {
         this.quantity = quantity;
         this.member = member;
         this.product = product;
+    }
+
+    public void plusQuantity(){
+        this.quantity++;
+    }
+
+    public void minusQuantity(){
+        if(this.quantity<2){
+            throw new IllegalArgumentException(
+                    CartErrorMessage.QUANTITY_ONE_OR_MORE.getMessage()+CartErrorMessage.DELETE_RECOMMEND.getMessage()
+            );
+        }
+        this.quantity--;
+    }
+
+    public void updateQuantity(long quantity) {
+        if(quantity<1){
+            throw new IllegalArgumentException(CartErrorMessage.QUANTITY_ONE_OR_MORE.getMessage());
+        }
+        this.quantity = quantity;
     }
 }
