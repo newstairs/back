@@ -4,7 +4,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-/src/main/resources/application.yml
 
 ### STS ###
 .apt_generated
@@ -41,5 +40,4 @@ out/
 .DS_Store
 
 ### 설정파일 ###
-application.yml
 application-local.yml
