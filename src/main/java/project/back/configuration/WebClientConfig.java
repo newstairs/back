@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.transport.ProxyProvider;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,8 @@ public class WebClientConfig {
                 .doOnConnected(connection -> {
                     connection.addHandlerFirst(new ReadTimeoutHandler(500, TimeUnit.MILLISECONDS))
                             .addHandlerLast(new WriteTimeoutHandler(500,TimeUnit.MILLISECONDS));
-                });
+                })
+                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
 
         WebClient webClient=WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
