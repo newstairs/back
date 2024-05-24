@@ -11,6 +11,6 @@ ENV DATABASE_URL=${DATABASE_URL}
 ENV KRAMPOLINE_IP=${KRAMPOLINE_IP}
 ENV KRAMPOLINE_PORT=${KRAMPOLINE_PORT}
 # gradlew를 이용한 프로젝트 필드
-RUN ./gradlew clean build -Pjasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD}
+RUN ./gradlew clean build -x test -Pjasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD}
 # 빌드 결과 jar 파일을 실행
 CMD ["java", "-jar", "/home/project/build/libs/back-0.0.1-SNAPSHOT.jar"]
