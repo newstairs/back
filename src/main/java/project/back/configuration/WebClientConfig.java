@@ -5,6 +5,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -20,6 +21,12 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
+    @Value("${krampoline.host.url}")
+    private String proxyHost;
+
+    @Value("${krampoline.host.port}")
+    private int proxyPort;
+
     @Bean
     public WebClient webClient(){
 
