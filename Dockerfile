@@ -8,9 +8,10 @@ COPY . .
 RUN echo "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
 # DATABASE_URL, KRAMPOLINE_IP/PORT 를 환경변수로 설정
 ENV DATABASE_URL=${DATABASE_URL}
-ENV KRAMPOLINE_IP=${KRAMPOLINE_IP}
-ENV KRAMPOLINE_PORT=${KRAMPOLINE_PORT}
-# gradlew를 이용한 프로젝트 필드
+ENV KRAMPOLINE_HOST_IP=${KRAMPOLINE_HOST_IP}
+ENV KRAMPOLINE_HOST_PORT=${KRAMPOLINE_HOST_PORT}
+# gradlew에 실행 권한 부여 및 프로젝트 필드
+RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test -Pjasypt.encryptor.password=${JASYPT_ENCRYPTOR_PASSWORD}
 # 빌드 결과 jar 파일을 실행
 CMD ["java", "-jar", "/home/project/build/libs/back-0.0.1-SNAPSHOT.jar"]
