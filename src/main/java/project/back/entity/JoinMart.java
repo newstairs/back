@@ -11,20 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+public class JoinMart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long joinId;
 
     @Column(nullable = false)
-    private String productName;
-
-    @Column(nullable = true)
-    private String productImgUrl;
-
-    public Product(String productName, String productImgUrl) {
-        this.productName = productName;
-        this.productImgUrl = productImgUrl;
-    }
+    private String store;
 }

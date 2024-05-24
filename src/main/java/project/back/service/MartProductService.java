@@ -1,24 +1,24 @@
 package project.back.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.back.configuration.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.CartProductDto;
 import project.back.dto.DiscountInfoDto;
 import project.back.dto.ProductAndDiscountDataDto;
+import project.back.entity.JoinMart;
 import project.back.entity.Mart;
 import project.back.entity.Member;
 import project.back.entity.Product;
-import project.back.etc.aboutlogin.JwtUtill;
 import project.back.etc.commonException.NoContentFoundException;
-import project.back.repository.CartRepository;
-import project.back.repository.MartProductRepository;
-import project.back.repository.ProductRepository;
+import project.back.etc.martproduct.MartAndProductMessage;
+import project.back.repository.*;
 import project.back.repository.memberrepository.MemberRepository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,8 +31,9 @@ public class MartProductService {
     private final MartProductRepository martProductRepository;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final JoinMartRepository joinMartRepository;
+    private final MartRepository martRepository;
     private final MemberRepository memberRepository;
-    private final JwtUtill jwtUtill;
 
     /**
      * 장바구니에 있는 모든 상품이 존재하는 마트 목록 + 마트별 합계 출력
@@ -42,13 +43,13 @@ public class MartProductService {
      * @throws NoContentFoundException 장바구니에 데이터가 존재하지 않거나 비어있을 때 발생
      */
     @Transactional(readOnly = true)
-    public ApiResponse<Map<Long, Long>> findMartsByProductIds(HttpServletRequest request) {
-        ProductAndDiscountDataDto loadData = getProductAndDiscountData(request);
+    public ApiResponse<Map<Long, Long>> findMartsByProductIds(@LoginUser Long memberId) {
+        ProductAndDiscountDataDto loadData = getProductAndDiscountData(memberId);
 
         return ApiResponse.success(calculateTotalFinalPriceByMart(
-                loadData.getDiscountInfoList(),
-                loadData.getCartProductList()),
-                "마트별 총 합계를 불러왔습니다.");
+                        loadData.getDiscountInfoList(),
+                        loadData.getCartProductList()),
+                MartAndProductMessage.LOADED_TOTAL_SUM.getMessage());
     }
 
     /**
@@ -59,54 +60,48 @@ public class MartProductService {
      * @throws NoContentFoundException 장바구니에 데이터가 존재하지 않거나 비어있을 때 발생
      */
     @Transactional(readOnly = true)
-    public ApiResponse<List<DiscountInfoDto>> findMartInfoByMartId(Long martId, HttpServletRequest request) {
-        ProductAndDiscountDataDto loadData = getProductAndDiscountData(request);
+    public ApiResponse<List<DiscountInfoDto>> findMartInfoByMartId(Long martId, @LoginUser Long memberId) {
+        ProductAndDiscountDataDto loadData = getProductAndDiscountData(memberId);
+
+        Long joinId = martRepository.findJoinIdByMartId(martId)
+                .orElseThrow(() -> new EntityNotFoundException(MartAndProductMessage.NOT_FOUND_MART_DETAILS.getMessage()));
+
         List<DiscountInfoDto> filteredDiscountInfo = loadData.getDiscountInfoList().stream()
-                .filter(dto -> dto.getMartId().equals(martId))
+                .filter(dto -> dto.getJoinId().equals(joinId))
                 .toList();
 
-        return ApiResponse.success(filteredDiscountInfo, "마트 상품의 세부사항을 불러왔습니다.");
+        return ApiResponse.success(filteredDiscountInfo, MartAndProductMessage.LOADED_MART_DETAILS.getMessage());
     }
 
-    /** 사용자를 확인하고, 해당 사용자의 상품 목록과 각 상품의 마트별 할인 정보 반환 */
-    private ProductAndDiscountDataDto getProductAndDiscountData(HttpServletRequest request) {
-        String accessToken = request.getHeader("Authorization").substring(7);
-        Long memberId = jwtUtill.getidfromtoken(accessToken);
+    /** 사용자 확인 */
+    private ProductAndDiscountDataDto getProductAndDiscountData(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage()));
 
-        // 회원 정보 확인
-        Optional<Member> member = memberRepository.findById(memberId);
-        if (member.isEmpty()) {
-            throw new EntityNotFoundException("사용자 정보를 찾을 수 없습니다.");
-        }
-
-        return loadProductsAndDiscounts(memberId);
+        return loadProductsAndDiscounts(member);
     }
 
-    /** memberId로 해당 회원의 장바구니에 있는 상품 목록과 각 상품의 마트별 할인 정보를 반환 */
-    private ProductAndDiscountDataDto loadProductsAndDiscounts(Long memberId) {
-        /* 장바구니에 있는 상품 목록 가져오기 */
-        List<CartProductDto> cartProductList = cartRepository.findCartsByMemberMemberId(memberId);
-        // memberId에 해당하는 장바구니가 없을 경우
+    /** 회원의 장바구니에 있는 상품 목록과 각 상품의 마트별 할인 정보를 반환 */
+    private ProductAndDiscountDataDto loadProductsAndDiscounts(Member member) {
+        List<CartProductDto> cartProductList = cartRepository.findCartsByMember(member);
         if (cartProductList.isEmpty()) {
-            throw new NoContentFoundException("장바구니가 존재하지 않습니다.");
+            throw new NoContentFoundException(MartAndProductMessage.EMPTY_CART.getMessage());
         }
 
         List<Product> productList = cartProductList.stream()
                 .map(dto -> productRepository.findById(dto.getProductId()))
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
-        // 상품 목록이 비어있을 경우
         if (productList.isEmpty()) {
-            throw new NoContentFoundException("장바구니 목록이 비어있습니다.");
+            throw new NoContentFoundException(MartAndProductMessage.EMPTY_CART_PRODUCTS.getMessage());
         }
         Long numberOfProducts = (long) productList.size();
 
-        List<Mart> martList =
-                martProductRepository.findMartsSellingAllProducts(productList, numberOfProducts);
+        List<JoinMart> joinMartList =
+                joinMartRepository.findJoinMartsSellingAllProducts(productList, numberOfProducts);
 
-        /* 마트별로 할인 적용하여 상품 가격 출력 */
         List<DiscountInfoDto> discountInfoList =
-                martProductRepository.findDiscountsByProductsAndMarts(productList, martList);
+                martProductRepository.findDiscountsByProductsAndJoinMarts(productList, joinMartList);
 
         return new ProductAndDiscountDataDto(productList, discountInfoList, cartProductList);
     }
@@ -120,14 +115,19 @@ public class MartProductService {
                 .collect(Collectors.toMap(
                         CartProductDto::getProductId,
                         CartProductDto::getQuantity,
-                        (a, b) -> b));
+                        Long::sum));
 
-        return discountInfoDto.stream()
+        Map<Long, Long> martIdToTotalPrice = new HashMap<>();
+
+        discountInfoDto.stream()
                 .filter(dto -> productIdToQuantity.containsKey(dto.getProductId()))
-                .collect(Collectors.groupingBy(
-                        DiscountInfoDto::getMartId,
-                        Collectors.summingLong(
-                                dto -> dto.getFinalPrice() * productIdToQuantity.get(dto.getProductId()))
-                ));
+                .forEach(dto -> {
+                    List<Mart> marts = martRepository.findByJoinMartJoinId(dto.getJoinId());
+                    marts.forEach(mart -> {
+                        Long totalPrice = dto.getFinalPrice() * productIdToQuantity.get(dto.getProductId());
+                        martIdToTotalPrice.merge(mart.getId(), totalPrice, Long::sum);
+                    });
+                });
+        return martIdToTotalPrice;
     }
 }

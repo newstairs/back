@@ -11,20 +11,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product {
+public class MartInfo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long dataId;
 
     @Column(nullable = false)
     private String productName;
 
-    @Column(nullable = true)
-    private String productImgUrl;
+    @Column(nullable = false)
+    private String salePrice;
 
-    public Product(String productName, String productImgUrl) {
-        this.productName = productName;
-        this.productImgUrl = productImgUrl;
-    }
+    @Column(nullable = false)
+    private String store;
+
+    @Column(nullable = true)
+    private String manufacturer;
 }
