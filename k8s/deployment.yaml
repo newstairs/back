@@ -27,3 +27,7 @@ spec:
                 secretKeyRef:
                   name: krampoline-secret
                   key: databaseUrl
+            - name: KRAMPOLINE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
