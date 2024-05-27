@@ -41,6 +41,3 @@ out/
 
 ### 설정파일 ###
 application-local.yml
-
-### Krampoline ###
-goorm.manifest
