@@ -25,7 +25,7 @@ public class ReviewService {
     private final MartRepository martRepository;
 
     //review 조회 서비스
-    public List<ReviewDto> getReviewByMartId(Long martId){
+    public List<ReviewDto> getReviewByMartId(Long martId) {
         List<ReviewDto> reviewDtos = new ArrayList<>();
 
         List<Review> reviews = reviewRepository.findByMart_Id(martId); //리뷰 없을시 빈 리스트 반
@@ -41,7 +41,7 @@ public class ReviewService {
     }
 
     //review + 평점 작성하기 서비스
-    public Review writeReview(ReviewDto reviewDto){
+    public Review writeReview(ReviewDto reviewDto) {
         Member member = memberRepository.findById(reviewDto.getMemberId())
                 .orElseThrow(() -> new EntityNotFoundException("Member not found "));
 
@@ -59,16 +59,16 @@ public class ReviewService {
     }
 
     //리뷰 + 평점 삭제하기 서비스
-    public void deleteReview(Long reviewId){
+    public void deleteReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(()->new EntityNotFoundException("Review not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Review not found"));
         reviewRepository.delete(review);
     }
 
     //리뷰 + 평점 수정하기 서비스
-    public ReviewDto updateReview(Long reviewId, String content, BigDecimal score){
+    public ReviewDto updateReview(Long reviewId, String content, BigDecimal score) {
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(()-> new EntityNotFoundException("review not find"));
+                .orElseThrow(() -> new EntityNotFoundException("review not find"));
 
         // Builder를 사용하여 기존 리뷰의 내용과 평점을 수정
         Review updatedReview = Review.builder()
