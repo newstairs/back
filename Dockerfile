@@ -7,7 +7,7 @@ COPY . .
 # gradle 빌드 시 proxy 설정을 gradle.properties에 추가
 RUN echo "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPort=3128\nsystemProp.https.proxyHost=krmp-proxy.9rum.cc\nsystemProp.https.proxyPort=3128" > /root/.gradle/gradle.properties
 # DATABASE_URL, KRAMPOLINE_IP/PORT 를 환경변수로 설정
-ENV DATABASE_URL=jdbc:mysql://mysql/sgmjdb
+ENV DATABASE_URL=${DATABASE_URL}
 ENV KRAMPOLINE_HOST_IP=${KRAMPOLINE_HOST_IP}
 ENV KRAMPOLINE_HOST_PORT=${KRAMPOLINE_HOST_PORT}
 # gradlew에 실행 권한 부여 및 프로젝트 필드
