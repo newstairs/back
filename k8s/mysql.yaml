@@ -23,7 +23,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: krampoline-secret
-                  key: passwordKey # secret에서 설정한 key
+                  key: databasePassword # secret에서 설정한 값
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
