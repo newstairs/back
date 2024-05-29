@@ -33,6 +33,7 @@ spring:
       platform: mysql
       mode: always
   datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATABASE_URL}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
     username: ENC(WDRhDR82jagUGYf6sUMXeA==)
     password: ENC(oMm0+X9Ho72GSrmUJOb9bQ==)
