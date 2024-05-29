@@ -43,7 +43,7 @@ spring:
         show_sql: true
         format_sql: true
         highlight_sql: true
-		dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: validate
     defer-datasource-initialization: true
