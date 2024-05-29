@@ -15,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
-import project.back.dto.CartDto;
-import project.back.dto.ProductSearchDto;
-import project.back.entity.Product;
+import project.back.dto.cart.CartDto;
+import project.back.dto.cart.ProductSearchDto;
+import project.back.entity.product.Product;
 import project.back.etc.commonException.ConflictException;
 import project.back.etc.commonException.NoContentFoundException;
-import project.back.repository.ProductRepository;
+import project.back.repository.product.ProductRepository;
+import project.back.service.cart.CartService;
 
 @SpringBootTest
 class CartServiceTest {
