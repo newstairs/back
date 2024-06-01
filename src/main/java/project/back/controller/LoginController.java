@@ -75,77 +75,8 @@ public class LoginController {
     public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
         MultiValueMap<String, String> accessTokenParam = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
-        //MultiValueMap<String, String> accessTokenRequest = accessTokenParam;
-        String answerfromapi=webClient
-                .mutate()
-                .baseUrl(tokenuri)
-                .defaultHeader("Content-type","application/x-www-form-urlencoded;charset=utf-8")
-                .build()
-                .post()
-                .body(BodyInserters.fromFormData(accessTokenParam))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        List<Object>tokendata=memberService.TryLogin(accessTokenParam);
 
-
-
-        //받아온 데이터를 파싱하기. access_token을 받아오는 과정.
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(answerfromapi);
-
-        String header = "Bearer " + jsonObject.get("access_token");
-        System.out.println("header = " + header);
-        Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", header);
-
-        String userdata=webClient.mutate()
-                .defaultHeader("Authorization",header)
-                .build()
-                .get()
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-        JSONObject profile=(JSONObject) jsonParser.parse(userdata);
-
-        JSONObject properties = (JSONObject) profile.get("properties");
-
-
-
-
-        JSONObject kakao_account = (JSONObject) profile.get("kakao_account");
-
-        String email = (String) kakao_account.get("email");
-        String userName = (String) properties.get("nickname");
-
-        String user_profile_image=(String) properties.get("profile_image");
-
-
-
-        //애같은 경우 이메일로 이미 가입한 멤버인지 체크 하는 과정.
-        Optional<Member> member=memberService.finbdyemail(email);
-
-
-        /*
-        멤버가 있을경우 db에 다시저장하는 과정을 스킵하고 없으면 db 저장
-        */
-        List<Object> tokendata=gettokenandresponse(email,userName,member);
-
-
-        /*
-
-        * 레디스에 멤버 아이디로 저장되는 access_tokend이 존재시
-        값을 지우고 다시저장 즉 최신화 없다면 최초저장.*/
-        if(redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",(Long)tokendata.get(1)))==null){
-
-            redisTemplate.opsForValue().set(String.format("member_kakao_token_%d",(Long)tokendata.get(1)),jsonObject.get("access_token")
-                    ,1000, TimeUnit.SECONDS);
-        }
-        else{
-            redisTemplate.opsForValue().set(String.format("member_kakao_token_%d",(Long)tokendata.get(1)),jsonObject.get("access_token"));
-        }
-
-
-        ApiResponse.success((String)tokendata.get(0),"로그인 성공");
         return new ResponseEntity<>( ApiResponse.success((String)tokendata.get(0),"로그인 성공"), HttpStatus.OK);
     }
 
@@ -160,34 +91,6 @@ public class LoginController {
     }
 
 
-    public List<Object> gettokenandresponse(String email, String username, Optional<Member> member) throws IOException{
-        if(member.isPresent()){
-            Member m=member.get();
-
-            JwtToken jwtToken=jwtUtill.genjwt(username,m.getMemberId());
-
-            List<Object> obj=new ArrayList<>();
-            obj.add(jwtToken.getAccesstoken());
-            obj.add(m.getMemberId());
-
-
-            return obj;
-        }
-        else{
-
-            Long id=memberService.memebersave(new MemberDto(email,username));
-
-
-            JwtToken jwtToken=jwtUtill.genjwt(username,id);
-
-            List<Object> obj=new ArrayList<>();
-            obj.add(jwtToken.getAccesstoken());
-            obj.add(id);
-
-            return obj;
-        }
-
-    }
 
 
     @GetMapping("/logouts")
