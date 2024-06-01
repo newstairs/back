@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RecipeApiDto {
+public class RecipeApiProcessingDto {
     @JsonProperty("RCP_SEQ")
     private Long recipeApiNo;
     @JsonProperty("RCP_NM")

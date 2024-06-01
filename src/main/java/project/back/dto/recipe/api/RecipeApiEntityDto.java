@@ -1,16 +1,18 @@
-package project.back.dto.recipe;
+package project.back.dto.recipe.api;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import project.back.dto.recipe.RecipeManualDto;
+import project.back.dto.recipe.RecipePartsDto;
 import project.back.entity.recipe.Recipe;
+
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class RecipeResponseDto {
-    private Long recipeId;
+public class RecipeApiEntityDto {
     private String recipeName;
     private String recipeType;
     private String recipeTip;
@@ -18,8 +20,7 @@ public class RecipeResponseDto {
     private List<RecipePartsDto> recipePartsList;
 
     @Builder
-    public RecipeResponseDto(Long recipeId, String recipeName, String recipeType, String recipeTip, List<RecipeManualDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
-        this.recipeId = recipeId;
+    public RecipeApiEntityDto(String recipeName, String recipeType, String recipeTip, List<RecipeManualDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
         this.recipeName = recipeName;
         this.recipeType = recipeType;
         this.recipeTip = recipeTip;
@@ -27,9 +28,8 @@ public class RecipeResponseDto {
         this.recipePartsList = recipePartsList;
     }
 
-    public static RecipeResponseDto toResponseDto(Recipe recipe, List<RecipeManualDto> manualList, List<RecipePartsDto> partsList) {
-        return RecipeResponseDto.builder()
-                .recipeId(recipe.getRecipeId())
+    public static RecipeApiEntityDto toEntityDto(Recipe recipe, List<RecipeManualDto> manualList, List<RecipePartsDto> partsList) {
+        return RecipeApiEntityDto.builder()
                 .recipeName(recipe.getRecipeName())
                 .recipeType(recipe.getRecipeType())
                 .recipeTip(recipe.getRecipeTip())
