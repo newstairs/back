@@ -8,11 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.back.dto.ApiResponse;
-import project.back.dto.ProductDto;
-import project.back.entity.Product;
+import project.back.dto.product.ProductDto;
+import project.back.entity.product.Product;
 import project.back.etc.commonException.NoContentFoundException;
 import project.back.etc.martproduct.MartAndProductMessage;
-import project.back.repository.ProductRepository;
+import project.back.repository.product.ProductRepository;
+import project.back.service.product.ProductService;
 
 import java.util.List;
 
