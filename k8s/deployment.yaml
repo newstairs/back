@@ -27,3 +27,9 @@ spec:
                 secretKeyRef:
                   name: krampoline-secret
                   key: databaseUrl
+            - name: KRAMPOLINE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: KRAMPOLINE_PORT
+              value: "8080"
