@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
-//    @Value("${krampoline.host.url}")
-    private String proxyHost = "https://espjj-apqjjhpznz.krampoline.com";
+    @Value("${cloud.host.url}")
+    private String proxyHost;
 
-//    @Value("${krampoline.host.port}")
-    private int proxyPort = 80;
+    @Value("${cloud.host.port}")
+    private int proxyPort;
 
     @Bean
     public WebClient webClient(){
