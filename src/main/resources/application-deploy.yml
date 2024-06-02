@@ -5,7 +5,7 @@ spring:
         registration:
           kakao:
             client-id: ENC(SgyhNpimVFEoQv9a5MChlCiao3nJgYEjGxB/3KAtTlhYxEeZdrD3PzJ0Io2vnrLS)
-            redirect-uri: https://k56733b335962a.user-app.krampoline.com/login/oauth2/callback/kakao
+            redirect-uri: https://${KRAMPOLINE_IP}:${KRAMPOLINE_PORT}/login/oauth2/callback/kakao
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             scope:
@@ -28,8 +28,12 @@ spring:
     check-template-location: true
     prefix: classpath:/templates/
     suffix: .html
+  sql:
+    init:
+      platform: mysql
+      mode: always
   datasource:
-    url: ${DATABASE_URL}
+    url: ${DATABASE_URL}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
     username: ENC(WDRhDR82jagUGYf6sUMXeA==)
     password: ENC(oMm0+X9Ho72GSrmUJOb9bQ==)
   jpa:
@@ -40,6 +44,7 @@ spring:
         highlight_sql: true
     hibernate:
       ddl-auto: validate
+    defer-datasource-initialization: true
 
 jwt:
   secret: ENC(7kZtvyRlzXjVdNHt8cyWg+1XRqosKTVcq+o1apX4xQmP2ZY2nnPkATLDev2IjZWT4orx4/T4bHuIcyqhssP6mg==)
@@ -52,3 +57,8 @@ app:
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
+
+kakao:
+  rest:
+    api:
+      key: ENC(WtmsCNhytxXOPencBobCEv6weKiLloqWgmz0IyKzYI2yWr/tunFfjjlD4EK5xNrn)
