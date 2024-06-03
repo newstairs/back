@@ -14,7 +14,7 @@ spec:
       containers:
         - name: krampoline
           # 여러분의 image 주소를 입력해주세요.
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_52f90732b72b
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_13edd5e55041
           imagePullPolicy: Always
           env:
             - name: JASYPT_ENCRYPTOR_KEY
