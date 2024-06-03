@@ -15,7 +15,7 @@ public enum MartAndProductMessage {
     EMPTY_CART("장바구니가 비어있습니다."),
     EMPTY_CART_PRODUCTS("장바구니 상품목록이 비어있습니다."),
     EMPTY_PRODUCT_LIST("상품목록이 비어있습니다."),
-    ERROR_PRODUCT_IMG_PROCESSING("이미지 파일 처리 중 오류가 발생했습니다");
+    ERROR_PRODUCT_IMG_PROCESSING("이미지 파일 처리 중 오류가 발생했습니다.");
 
     private final String message;
 
