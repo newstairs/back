@@ -36,8 +36,8 @@ public class WebClientConfig {
                 .doOnConnected(connection -> {
                     connection.addHandlerFirst(new ReadTimeoutHandler(500, TimeUnit.MILLISECONDS))
                             .addHandlerLast(new WriteTimeoutHandler(500,TimeUnit.MILLISECONDS));
-                });
-//                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
+                })
+                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
 
         WebClient webClient=WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
