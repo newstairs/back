@@ -14,10 +14,10 @@ spec:
       containers:
         - name: krampoline
           # 여러분의 image 주소를 입력해주세요.
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_47a3460761d6
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_52f90732b72b
           imagePullPolicy: Always
           env:
-            - name: JASYPT_ENCRYPTOR_PASSWORD
+            - name: JASYPT_ENCRYPTOR_KEY
               valueFrom:
                 secretKeyRef:
                   name: krampoline-secret
@@ -27,9 +27,8 @@ spec:
                 secretKeyRef:
                   name: krampoline-secret
                   key: databaseUrl
-            - name: KRAMPOLINE_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: KRAMPOLINE_PORT
-              value: "8080"
+            # 컨테이너 실행 URL 및 포트 설정해주기
+            - name: KRAMPOLINE_HOST_URL
+              value: "https://fknsp-zpvykljfeg.krampoline.com"
+            - name: KRAMPOLINE_HOST_PORT
+              value: "80"

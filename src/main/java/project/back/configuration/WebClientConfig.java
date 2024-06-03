@@ -5,6 +5,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -20,6 +21,12 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
+    @Value("${cloud.host.url}")
+    private String proxyHost;
+
+    @Value("${cloud.host.port}")
+    private int proxyPort;
+
     @Bean
     public WebClient webClient(){
 
@@ -29,8 +36,8 @@ public class WebClientConfig {
                 .doOnConnected(connection -> {
                     connection.addHandlerFirst(new ReadTimeoutHandler(500, TimeUnit.MILLISECONDS))
                             .addHandlerLast(new WriteTimeoutHandler(500,TimeUnit.MILLISECONDS));
-                });
-//                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
+                })
+                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
 
         WebClient webClient=WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
