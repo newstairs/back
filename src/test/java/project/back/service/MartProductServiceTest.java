@@ -34,10 +34,18 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MartProductServiceTest {
+    private final Long memberId = 1L;
+    private final Long martAId = 1L;
+    private final Long martBId = 2L;
+    private final Long joinAId = 1L;
+    private final Long joinBId = 3L;
+    private final Long productAId = 1L;
+    private final Long productBId = 2L;
     @Mock
     private MartProductRepository martProductRepository;
     @Mock
@@ -52,17 +60,10 @@ class MartProductServiceTest {
     private MemberRepository memberRepository;
     @InjectMocks
     private MartProductService martProductService;
-
     private Member member;
     private ProductAndDiscountDataDto mockloadData;
     private Map<Long, Long> expectedTotalFinalPrice;
-    private final Long memberId = 1L;
-    private final Long martAId = 1L;
-    private final Long martBId = 2L;
-    private final Long joinAId = 1L;
-    private final Long joinBId = 3L;
-    private final Long productAId = 1L;
-    private final Long productBId = 2L;
+
     @BeforeEach
     void 초기_설정() {
         member = Mockito.mock(Member.class);
@@ -132,11 +133,11 @@ class MartProductServiceTest {
     @Test
     @DisplayName("사용자 정보를 찾을 수 없는 경우")
     void 회원_정보_예외테스트() {
-      when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-      EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-              () -> martProductService.findMartInfoByMartId(martAId, memberId));
-      assertThat(exception.getMessage()).isEqualTo(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage());
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> martProductService.findMartInfoByMartId(martAId, memberId));
+        assertThat(exception.getMessage()).isEqualTo(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage());
     }
 
     @Test
