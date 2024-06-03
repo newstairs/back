@@ -45,7 +45,7 @@ public class ProductService {
     private ProductDto convertToProductDto(Product product) {
         String base64Image =
                 "data:image/jpeg;base64," + encodeImageToBase64(product.getProductImgUrl());
-        return new ProductDto(product.getProductName(), base64Image);
+        return new ProductDto(product.getProductId(), product.getProductName(), base64Image);
     }
 
     /** 이미지 파일을 Base64로 인코딩하여 반환 */
