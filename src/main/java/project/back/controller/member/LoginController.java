@@ -63,7 +63,7 @@ public class LoginController {
 
 
 
-    @GetMapping("/reqlogin")
+    @PostMapping("/reqlogin")
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
