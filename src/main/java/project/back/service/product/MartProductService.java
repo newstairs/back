@@ -9,9 +9,9 @@ import project.back.dto.ApiResponse;
 import project.back.dto.product.CartProductDto;
 import project.back.dto.product.DiscountInfoDto;
 import project.back.dto.product.ProductAndDiscountDataDto;
-import project.back.entity.product.JoinMart;
 import project.back.entity.mart.Mart;
 import project.back.entity.member.Member;
+import project.back.entity.product.JoinMart;
 import project.back.entity.product.Product;
 import project.back.etc.commonException.NoContentFoundException;
 import project.back.etc.martproduct.MartAndProductMessage;
@@ -77,7 +77,9 @@ public class MartProductService {
         return ApiResponse.success(filteredDiscountInfo, MartAndProductMessage.LOADED_MART_DETAILS.getMessage());
     }
 
-    /** 사용자 확인 */
+    /**
+     * 사용자 확인
+     */
     private ProductAndDiscountDataDto getProductAndDiscountData(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage()));
@@ -85,7 +87,9 @@ public class MartProductService {
         return loadProductsAndDiscounts(member);
     }
 
-    /** 회원의 장바구니에 있는 상품 목록과 각 상품의 마트별 할인 정보를 반환 */
+    /**
+     * 회원의 장바구니에 있는 상품 목록과 각 상품의 마트별 할인 정보를 반환
+     */
     private ProductAndDiscountDataDto loadProductsAndDiscounts(Member member) {
         List<CartProductDto> cartProductList = cartRepository.findCartsByMember(member);
         if (cartProductList.isEmpty()) {
@@ -110,7 +114,9 @@ public class MartProductService {
         return new ProductAndDiscountDataDto(productList, discountInfoList, cartProductList);
     }
 
-    /** 마트별로 상품의 최종 가격을 수량과 함께 계산하여, 각 마트의 총 합계를 반환 */
+    /**
+     * 마트별로 상품의 최종 가격을 수량과 함께 계산하여, 각 마트의 총 합계를 반환
+     */
     private Map<Long, Long> calculateTotalFinalPriceByMart(
             List<DiscountInfoDto> discountInfoDto,
             List<CartProductDto> cartProductList

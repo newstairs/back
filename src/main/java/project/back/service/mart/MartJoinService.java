@@ -10,29 +10,31 @@ import project.back.dto.ApiResponse;
 import project.back.dto.mart.MartJoinContentDto;
 import project.back.dto.mart.MartLocationDto;
 import project.back.dto.mart.MartResponseDto;
-import project.back.entity.product.JoinMart;
 import project.back.entity.mart.Mart;
 import project.back.entity.member.Member;
+import project.back.entity.product.JoinMart;
 import project.back.etc.martproduct.MartAndProductMessage;
 import project.back.repository.mart.MartRepository;
 import project.back.repository.mart.MemberJoinRepository;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class MartJoinService {
 
-    @Value("${kakao.rest.api.key}")
-    private String restApiKey;
-
     private final MemberJoinRepository memberJoinRepository;
     private final RestTemplate restTemplate;
     private final MartRepository martRepository;
+    @Value("${kakao.rest.api.key}")
+    private String restApiKey;
 
     //memberId를 통해 주소 찾아내기
-    public String findAddress(Long memberId){
+    public String findAddress(Long memberId) {
         Optional<Member> memberOptional = memberJoinRepository.findById(memberId);
 
         if (memberOptional.isPresent()) {
@@ -44,7 +46,7 @@ public class MartJoinService {
     }
 
     //주소를 받아서 카카오api 사용해서  위도와 경도 찾아내는 것
-    public MartLocationDto findLatitudeLongitude(String address){
+    public MartLocationDto findLatitudeLongitude(String address) {
         String url = "https://dapi.kakao.com/v2/local/search/address.json" + "?query=" + address;
 
         //헤더 만들기
@@ -66,8 +68,8 @@ public class MartJoinService {
                 if (!documents.isEmpty()) {
                     Map<String, Object> document = documents.get(0);
                     Map<String, Object> addressInfo = (Map<String, Object>) document.get("address");
-                    double latitude = Double.parseDouble((String)addressInfo.get("y")) ;
-                    double longitude =  Double.parseDouble((String) addressInfo.get("x"));
+                    double latitude = Double.parseDouble((String) addressInfo.get("y"));
+                    double longitude = Double.parseDouble((String) addressInfo.get("x"));
 
                     MartLocationDto martLocationDto = MartLocationDto.builder()
                             .latitude(latitude)
@@ -114,7 +116,9 @@ public class MartJoinService {
         return ApiResponse.fail(MartAndProductMessage.NOT_FOUND_MART.getMessage());
     }
 
-    /** 지도 API에서 받은 데이터를 MartJoinContentDto 에 담아서 반환 */
+    /**
+     * 지도 API에서 받은 데이터를 MartJoinContentDto 에 담아서 반환
+     */
     private MartJoinContentDto mapToDto(Map<String, Object> document) {
         return MartJoinContentDto.builder()
                 .id((String) document.get("id"))

@@ -1,9 +1,9 @@
 package project.back.repository.product;
 
-import project.back.entity.product.JoinMart;
-import project.back.entity.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import project.back.entity.product.JoinMart;
+import project.back.entity.product.Product;
 
 import java.util.List;
 
