@@ -1,7 +1,9 @@
 package project.back.repository.member;
 
 import jakarta.persistence.EntityManager;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import project.back.dto.member.MemberDto;
 import project.back.entity.member.Member;
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
 
 
@@ -25,8 +28,12 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
         List<Member> member=em.createQuery(query,Member.class)
                 .setParameter("email",email)
                 .getResultList();
+        if(member.size()>=1){
+            Optional<Member> optmember=Optional.ofNullable(member.get(0));
+            return optmember;
+        }
 
-        Optional<Member> optmember=Optional.ofNullable(member.get(0));
+        Optional<Member> optmember=Optional.ofNullable(null);
 
 
 
@@ -36,7 +43,7 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
 
     @Override
     public Long membersave(MemberDto m) {
-        Member member=new Member(m.getEmail(),m.getUsername());
+        Member member=new Member(m.getEmail(),m.getUsername(),m.getAddress());
         member.setCreate_time(LocalDateTime.now());
 
         em.persist(member);

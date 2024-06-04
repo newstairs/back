@@ -1,6 +1,7 @@
 package project.back.etc.commonException;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     /**
      * 유효하지 않은 메서드 인자를 처리
@@ -60,6 +62,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<String>> handleRuntimeException(RuntimeException ex) {
+        log.info("err:{}",ex);
         return new ResponseEntity<>(ApiResponse.fail("서버 오류가 발생했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

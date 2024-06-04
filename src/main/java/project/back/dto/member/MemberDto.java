@@ -11,5 +11,6 @@ public class MemberDto {
     public MemberDto(String email, String username) {
         this.email = email;
         this.username = username;
+
     }
 }
