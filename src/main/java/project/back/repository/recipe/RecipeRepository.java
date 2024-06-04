@@ -1,5 +1,7 @@
 package project.back.repository.recipe;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,7 +12,9 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("""
-           SELECT r.recipeApiNo FROM Recipe r
-            """)
+            SELECT r.recipeApiNo FROM Recipe r
+             """)
     List<Long> findAllRecipeApiNos();
+
+    Page<Recipe> findAll(Pageable pageable);
 }
