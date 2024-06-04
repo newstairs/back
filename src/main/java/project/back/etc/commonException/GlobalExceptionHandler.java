@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<String>> handleRuntimeException(RuntimeException ex) {
         log.info("err:{}",ex);
-        return new ResponseEntity<>(ApiResponse.fail("서버 오류가 발생했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ApiResponse.fail("서버 오류가 발생했습니다."+ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
