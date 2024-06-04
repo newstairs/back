@@ -65,6 +65,7 @@ public class MemberService {
     }
 
     public  List<Object>  TryLogin(MultiValueMap<String, String> accessTokenParam) throws ParseException, IOException {
+        log.info("accesstokenparam:{}",accessTokenParam);
         String AnwserFromApi=webClient
                 .mutate()
                 .baseUrl(tokenuri)
@@ -138,8 +139,8 @@ public class MemberService {
 
             return member;
         }
-
-        Optional<Member>member=Optional.ofNullable((Member)redisTemplate.opsForHash().get("member",email));
+        Member m=objectMapper.readValue(redisTemplate.opsForHash().get("member",email).toString(),Member.class);
+        Optional<Member>member=Optional.ofNullable(m);
         return member;
     }
 
