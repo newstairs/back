@@ -67,7 +67,7 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("https://k56733b335962a.user-app.krampoline.com");
         configuration.addAllowedOrigin("https://k9bceeba41403a.user-app.krampoline.com");
         configuration.addAllowedOrigin("wss://k9bceeba41403a.user-app.krampoline.com");
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://localhost:3000/login/oauth2/callback/kakao");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
