@@ -33,7 +33,7 @@ public class SecurityConfig {
         return httpSecurity
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //.cors(c->c.configurationSource(corsConfigurationSource()))
+                .cors(c->c.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize)->{
                     authorize//.requestMatchers("/api1","/code/**","/mypage/**").hasRole("user")
@@ -70,7 +70,7 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("https://k9bceeba41403a.user-app.krampoline.com");
         configuration.addAllowedOrigin("wss://k9bceeba41403a.user-app.krampoline.com");*/
         //configuration.addAllowedOrigin("http://localhost:3000/login/oauth2/callback/kakao");
-        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
