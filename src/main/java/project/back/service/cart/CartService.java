@@ -14,8 +14,7 @@ import project.back.entity.member.Member;
 import project.back.entity.product.Product;
 import project.back.etc.commonException.ConflictException;
 import project.back.etc.commonException.NoContentFoundException;
-import project.back.etc.cart.enums.CartErrorMessage;
-import project.back.etc.cart.enums.CartSuccessMessage;
+import project.back.etc.cart.enums.CartMessage;
 import project.back.repository.cart.CartRepository;
 import project.back.repository.product.ProductRepository;
 import project.back.repository.member.MemberRepository;
@@ -41,10 +40,9 @@ public class CartService {
     @Transactional
     public ApiResponse<List<CartDto>> getCartsByMemberId(Long memberId) {
         Member member = getMemberByMemberId(memberId);
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
-                .map(CartDto::CartToDto)
-                .toList();
-        return ApiResponse.success(cartDtos, CartSuccessMessage.GET.getMessage());
+        List<CartDto> cartDtos = getCartDtoListByMember(member);
+
+        return ApiResponse.success(cartDtos, CartMessage.SUCCESS_GET.getMessage());
     }
 
     /**
@@ -63,7 +61,7 @@ public class CartService {
                 .map(ProductSearchDto::productToSearchDto)
                 .toList();
 
-        return ApiResponse.success(ProductSearchDtos, CartSuccessMessage.SEARCH.getMessage());
+        return ApiResponse.success(ProductSearchDtos, CartMessage.SUCCESS_SEARCH.getMessage());
     }
     /**
      * 상품을 장바구니에 저장(등록)
@@ -89,12 +87,10 @@ public class CartService {
 
         cartRepository.save(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
-                .map(CartDto::CartToDto)
-                .toList();
+//        List<CartDto> cartDtos = getCartDtoListByMember(member);
 
-        return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.ADD.getMessage(), cart.getProduct().getProductName())
+        return ApiResponse.success(null,
+                String.format(CartMessage.SUCCESS_ADD.getMessage(), cart.getProduct().getProductName())
         );
     }
     /**
@@ -102,68 +98,62 @@ public class CartService {
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 장바구니 목록(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "직접입력"한 값이 1보다 작은 경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> updateQuantity(Long productId, Long count, Long memberId) {
+    public ApiResponse<CartDto> updateQuantity(Long productId, Long count, Long memberId) {
         Cart cart = getCartByMemberIdAndProductId(memberId, productId);
 
         cart.updateQuantity(count);
         cartRepository.save(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
-                .map(CartDto::CartToDto)
-                .toList();
+        CartDto cartDto = CartDto.CartToDto(cart);
 
-        return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+        return ApiResponse.success(cartDto,
+                String.format(CartMessage.SUCCESS_UPDATE.getMessage(), cart.getProduct().getProductName()));
     }
     /**
      * 상품 수량 변경(증가)
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 장바구니 목록(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> plusQuantity(Long productId, Long memberId) {
+    public ApiResponse<CartDto> plusQuantity(Long productId, Long memberId) {
         Cart cart = getCartByMemberIdAndProductId(memberId, productId);
 
         cart.plusQuantity();
         cartRepository.save(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
-                .map(CartDto::CartToDto)
-                .toList();
+        CartDto cartDto = CartDto.CartToDto(cart);
 
-        return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+        return ApiResponse.success(cartDto,
+                String.format(CartMessage.SUCCESS_UPDATE.getMessage(), cart.getProduct().getProductName()));
     }
     /**
      * 상품 수량 변경(감소)
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 장바구니 목록(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "-"한 값이 0이하인 경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> minusQuantity(Long productId, Long memberId) {
+    public ApiResponse<CartDto> minusQuantity(Long productId, Long memberId) {
         Cart cart = getCartByMemberIdAndProductId(memberId, productId);
 
         cart.minusQuantity();
         cartRepository.save(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(cart.getMember()).stream()
-                .map(CartDto::CartToDto)
-                .toList();
+        CartDto cartDto = CartDto.CartToDto(cart);
 
-        return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.UPDATE.getMessage(), cart.getProduct().getProductName()));
+        return ApiResponse.success(cartDto,
+                String.format(CartMessage.SUCCESS_UPDATE.getMessage(), cart.getProduct().getProductName()));
     }
     /**
      * 장바구니 상품 삭제(개별)
@@ -181,12 +171,11 @@ public class CartService {
 
         cartRepository.delete(cart);
 
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
-                .map(CartDto::CartToDto)
-                .toList();
+//        List<CartDto> cartDtos = getCartDtoListByMember(member);
 
-        return ApiResponse.success(cartDtos,
-                String.format(CartSuccessMessage.DELETE.getMessage(), cart.getProduct().getProductName()));
+
+        return ApiResponse.success(null,
+                String.format(CartMessage.SUCCESS_DELETE.getMessage(), cart.getProduct().getProductName()));
     }
 
     /**
@@ -200,49 +189,55 @@ public class CartService {
     public ApiResponse<List<CartDto>> deleteAllProduct(Long memberId) {
         Member member = getMemberByMemberId(memberId);
         cartRepository.deleteAllByMember(member);
-        List<CartDto> cartDtos = cartRepository.findByMemberEquals(member).stream()
-                .map(CartDto::CartToDto)
-                .toList();
-        return ApiResponse.success(cartDtos, CartSuccessMessage.DELETE_ALL.getMessage());
+
+//        List<CartDto> cartDtos = getCartDtoListByMember(member);
+
+        return ApiResponse.success(null, CartMessage.SUCCESS_DELETE_ALL.getMessage());
     }
 
     // member 검증 및 객체가져오는 메서드
     private Member getMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_FOUND_MEMBER.getMessage()));
+                .orElseThrow(() -> new EntityNotFoundException(CartMessage.NOT_FOUND_MEMBER.getMessage()));
     }
 
     // product 검증 및 객체가져오는 메서드
     private Product getProductByProductId(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException(CartErrorMessage.NOT_FOUND_PRODUCT.getMessage()));
+                .orElseThrow(() -> new EntityNotFoundException(CartMessage.NOT_FOUND_PRODUCT.getMessage()));
     }
 
     // Cart 검증 및 객체 가져오는 메서드
     private Cart getCartByMemberAndProduct(Member member, Product product) {
         return cartRepository.findByMemberEqualsAndProductEquals(member, product)
                 .orElseThrow(
-                        () -> new EntityNotFoundException(CartErrorMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
+                        () -> new EntityNotFoundException(CartMessage.NOT_EXIST_PRODUCT_IN_CART.getMessage()));
     }
     // member, product, cart를 검증 및 객체를 가져오는 메서드
     private Cart getCartByMemberIdAndProductId(Long memberId, Long productId){
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(productId);
-        Cart cart = getCartByMemberAndProduct(member, product);
-        return cart;
+
+        return getCartByMemberAndProduct(member, product);
+    }
+    // member로 List<Cart>를 가져와 List<CartDto>로 만드는 메서드
+    private List<CartDto> getCartDtoListByMember(Member member) {
+        return cartRepository.findByMemberEquals(member).stream()
+                .map(CartDto::CartToDto)
+                .toList();
     }
     // products 검증 메서드
     private void validateProducts(String productName, List<Product> products) {
         if (products.isEmpty()) {
             throw new NoContentFoundException(
-                    String.format(CartErrorMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
+                    String.format(CartMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
         }
     }
     // addProduct 시 이미 cart 에 존재하는 객체인지 검증하는 메서드
     private void checkAlreadyExist(Member member, Product product) {
         cartRepository.findByMemberEqualsAndProductEquals(member, product)
                 .ifPresent(c -> {
-                    throw new ConflictException(CartErrorMessage.ALREADY_EXIST_PRODUCT.getMessage());
+                    throw new ConflictException(CartMessage.ALREADY_EXIST_PRODUCT.getMessage());
                 });
     }
 }
