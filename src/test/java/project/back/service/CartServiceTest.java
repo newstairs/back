@@ -131,11 +131,8 @@ class CartServiceTest {
     void 상품_수량_변경_테스트(Long count, Long expected) {
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
 
-        ApiResponse<List<CartDto>> response = cartService.updateQuantity(commonProductId, count, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.updateQuantity(commonProductId, count, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(expected);
     }
@@ -145,11 +142,8 @@ class CartServiceTest {
     void 상품_수량_변경_테스트_증가(){
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
 
-        ApiResponse<List<CartDto>> response = cartService.plusQuantity(commonProductId, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.plusQuantity(commonProductId, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(2L);
     }
@@ -160,11 +154,8 @@ class CartServiceTest {
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
         cartService.updateQuantity(commonProductId, 6L, commonMemberId);
 
-        ApiResponse<List<CartDto>> response = cartService.minusQuantity(commonProductId, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.minusQuantity(commonProductId, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(5L);
     }
