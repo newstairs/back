@@ -1,3 +1,80 @@
+CREATE TABLE IF NOT EXISTS mart_info (
+    data_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    sale_price BIGINT NOT NULL,
+    store VARCHAR(255) NOT NULL,
+    manufacturer VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product (
+    product_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL UNIQUE,
+    product_img_url VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS join_mart (
+    join_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    store VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS mart (
+    mart_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    mart_address VARCHAR(255) NOT NULL,
+    mart_name VARCHAR(255) NOT NULL,
+    join_id BIGINT,
+    FOREIGN KEY (join_id) REFERENCES join_mart(join_id)
+);
+
+CREATE TABLE IF NOT EXISTS discount (
+    discount_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    discount_rate DECIMAL(3, 1) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS mart_product (
+    mart_product_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    stock BIGINT,
+    price BIGINT NOT NULL,
+    manufacturer VARCHAR(255) NOT NULL,
+    join_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    discount_id BIGINT,
+    FOREIGN KEY (join_id) REFERENCES join_mart(join_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id),
+    FOREIGN KEY (discount_id) REFERENCES discount(discount_id)
+);
+
+CREATE TABLE IF NOT EXISTS member (
+    member_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    address VARCHAR(255),
+    create_time TIMESTAMP NOT NULL,
+    update_time TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS member_seq (
+    next_val BIGINT DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cart (
+    cart_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quantity BIGINT NOT NULL,
+    member_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES member(member_id),
+    FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
+
+CREATE TABLE IF NOT EXISTS review (
+    review_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    review_content VARCHAR(255),
+    score DECIMAL(2, 1) NOT NULL,
+    member_id BIGINT NOT NULL,
+    mart_id BIGINT NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES member(member_id),
+    FOREIGN KEY (mart_id) REFERENCES mart(mart_id)
+);
+
 INSERT INTO mart_info (product_name, sale_price, store, manufacturer)
 VALUES ('옛날 자른당면(300g)', 4780, '농협', '오뚜기'),
        ('신라면(5개입)', 3900, '농협', '농심'),
@@ -1226,70 +1303,41 @@ VALUES ('옛날 자른당면(300g)', 4780, '농협', '오뚜기'),
 /* product 생성 */
 INSERT INTO product (product_name)
 SELECT DISTINCT product_name
-FROM mart_info;
+FROM mart_info
+ON DUPLICATE KEY UPDATE product_name = VALUES(product_name);
 
 /* join_mart 생성 */
 INSERT INTO join_mart (store)
 SELECT DISTINCT store
-FROM mart_info;
+FROM mart_info
+ON DUPLICATE KEY UPDATE store = VALUES(store);
 
 /* mart_product 생성 */
 INSERT INTO mart_product (price, manufacturer, join_id, product_id)
 SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
 FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE '농협';
-
-INSERT INTO mart_product (price, manufacturer, join_id, product_id)
-SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
-FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE '롯데';
-
-INSERT INTO mart_product (price, manufacturer, join_id, product_id)
-SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
-FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE '신세계백화점';
-
-INSERT INTO mart_product (price, manufacturer, join_id, product_id)
-SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
-FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE '이마트';
-
-INSERT INTO mart_product (price, manufacturer, join_id, product_id)
-SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
-FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE '현대백화점';
-
-INSERT INTO mart_product (price, manufacturer, join_id, product_id)
-SELECT mi.sale_price, mi.manufacturer, jm.join_id, p.product_id
-FROM mart_info mi
-         JOIN product p ON mi.product_name = p.product_name
-         JOIN join_mart jm ON mi.store = jm.store
-WHERE mi.store LIKE 'GS%';
+JOIN product p ON mi.product_name = p.product_name
+JOIN join_mart jm ON mi.store = jm.store;
 
 /* 상품 이미지 추가 */
-UPDATE product SET product_img_url = '/carrot.jpeg' WHERE product_name = '당근(흙당근, 100g)';
-UPDATE product SET product_img_url = '/redPepperPaste.jpeg' WHERE product_name = '해찬들 우리쌀태양초 고추장(1kg)';
-UPDATE product SET product_img_url = '/soySauce.jpeg' WHERE product_name = '양조간장 501(500ml)';
-UPDATE product SET product_img_url = '/sugar.jpeg' WHERE product_name = '백설 하얀설탕(1kg)';
-UPDATE product SET product_img_url = '/fishCake.jpeg' WHERE product_name = '삼호 안심 부산어묵(400g)';
-UPDATE product SET product_img_url = '/potato.jpeg' WHERE product_name = '감자(껍질 있는 감자, 100g)';
-UPDATE product SET product_img_url = '/sweetPotato.jpeg' WHERE product_name = '고구마(껍질 있는 밤고구마, 100g)';
-UPDATE product SET product_img_url = '/scallions.jpeg' WHERE product_name = '쪽파(흙쪽파)';
-UPDATE product SET product_img_url = '/onion.jpeg' WHERE product_name = '양파(껍질 있는 망포장, 1.5kg)';
-UPDATE product SET product_img_url = '/garlic.jpeg' WHERE product_name = '마늘(깐마늘, 100g)';
-UPDATE product SET product_img_url = '/freetime.jpeg' WHERE product_name = '자유시간(36g)';
-UPDATE product SET product_img_url = '/io.jpeg' WHERE product_name = '이오(5개)';
-UPDATE product SET product_img_url = '/noodles.jpeg' WHERE product_name = '옛날 자른당면(300g)';
+UPDATE product
+SET product_img_url = CASE product_name
+    WHEN '당근(흙당근, 100g)' THEN '/carrot.jpeg'
+    WHEN '해찬들 우리쌀태양초 고추장(1kg)' THEN '/redPepperPaste.jpeg'
+    WHEN '양조간장 501(500ml)' THEN '/soySauce.jpeg'
+    WHEN '백설 하얀설탕(1kg)' THEN '/sugar.jpeg'
+    WHEN '삼호 안심 부산어묵(400g)' THEN '/fishCake.jpeg'
+    WHEN '감자(껍질 있는 감자, 100g)' THEN '/potato.jpeg'
+    WHEN '고구마(껍질 있는 밤고구마, 100g)' THEN '/sweetPotato.jpeg'
+    WHEN '쪽파(흙쪽파)' THEN '/scallions.jpeg'
+    WHEN '양파(껍질 있는 망포장, 1.5kg)' THEN '/onion.jpeg'
+    WHEN '마늘(깐마늘, 100g)' THEN '/garlic.jpeg'
+    WHEN '자유시간(36g)' THEN '/freetime.jpeg'
+    WHEN '이오(5개)' THEN '/io.jpeg'
+    WHEN '옛날 자른당면(300g)' THEN '/noodles.jpeg'
+    ELSE product_img_url
+END;
+
 
 /* discount 생성 */
 INSERT INTO discount (discount_rate)
@@ -1299,10 +1347,14 @@ VALUES  (10.5),
         (20.5);
 
 /* 마트별 상품 할인율 */
-UPDATE mart_product SET discount_id = 1 WHERE mart_product_id = 1;
-UPDATE mart_product SET discount_id = 2 WHERE mart_product_id = 128;
-UPDATE mart_product SET discount_id = 3 WHERE mart_product_id = 383;
-UPDATE mart_product SET discount_id = 4 WHERE mart_product_id = 1149;
+UPDATE mart_product
+SET discount_id = CASE
+    WHEN mart_product_id = 1 THEN 1
+    WHEN mart_product_id = 128 THEN 2
+    WHEN mart_product_id = 383 THEN 3
+    WHEN mart_product_id = 1149 THEN 4
+    ELSE discount_id
+END;
 
 /* member 생성 */
 INSERT INTO member (email, name, address, create_time, update_time)
