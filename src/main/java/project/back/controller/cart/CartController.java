@@ -41,18 +41,6 @@ public class CartController {
     }
 
     /**
-     * [GET] productName 을 포함하는 검색한 모든 재료 검색
-     *
-     * @param productName 상품이름(String)
-     * @return 상품이름을 포함하는 모든 재료
-     */
-    @GetMapping("/{productName}")
-    public ResponseEntity<ApiResponse<List<ProductSearchDto>>> findAllByProductName(@PathVariable String productName) {
-
-        return ResponseEntity.ok(cartService.findAllByProductName(productName));
-    }
-
-    /**
      * [POST] 장바구니에 상품추가
      *
      * @param cartDto  (productId)
