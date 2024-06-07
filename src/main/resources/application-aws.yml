@@ -31,10 +31,6 @@ spring:
     check-template-location: true
     prefix: classpath:/templates/
     suffix: .html
-  sql:
-    init:
-      platform: mysql
-      mode: always
   datasource:
     url: ${DATABASE_URL}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
     username: ENC(WDRhDR82jagUGYf6sUMXeA==)
@@ -49,9 +45,12 @@ spring:
         highlight_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
+      ddl-auto: validate
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
 jwt:
   secret: ENC(7kZtvyRlzXjVdNHt8cyWg+1XRqosKTVcq+o1apX4xQmP2ZY2nnPkATLDev2IjZWT4orx4/T4bHuIcyqhssP6mg==)
   expiration: 3000
