@@ -45,7 +45,7 @@ spring:
         highlight_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
 
   flyway:
     enabled: true
