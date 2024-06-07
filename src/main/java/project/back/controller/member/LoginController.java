@@ -126,22 +126,21 @@ public class LoginController {
         List<String> friend_uuid=friendDataDto.getFriend_uuid();
         List<Item> item_list=friendDataDto.getItem_list();
         String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
-        ;
         String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"%s\"," +
                 "\"link\":" +
                 "{\"web_url\":\"https://developers.kakao.com\"," +
                 "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"바로 확인\"}",item_list.toString());
 
 
-        Map<String, String> formData = new HashMap<>();
-        formData.put("template_object", templateObject);
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("template_object", templateObject);
         String x=webClient.mutate()
                 .baseUrl("https://kapi.kakao.com/v2/api/talk/memo/default/send")
                 .defaultHeader("Content-Type","application/x-www-form-urlencoded")
                 .defaultHeader("Authorization",String.format("Bearer %s",kakao_token))
                 .build()
                 .post()
-                .body(BodyInserters.fromValue(formData))
+                .body(BodyInserters.fromFormData(formData))
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
