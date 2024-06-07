@@ -1,10 +1,6 @@
 name: Build and Deploy Spring Boot to AWS EC2
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - feature/deploy
+on: workflow_dispatch
 # 환경변수 설정
 env:
   # AWS 관련
