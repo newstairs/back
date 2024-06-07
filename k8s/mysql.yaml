@@ -15,7 +15,7 @@ spec:
       containers:
         - name: mysql
           # 여러분의 mysql image 주소를 입력해주세요.
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_cae88d07b436
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_697624df8b9d
           env:
             - name: TZ
               value: Asia/Seoul
@@ -23,7 +23,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: krampoline-secret
-                  key: passwordKey # secret에서 설정한 key
+                  key: databasePassword # secret에서 설정한 값
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:

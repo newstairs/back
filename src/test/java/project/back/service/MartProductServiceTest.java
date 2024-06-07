@@ -10,14 +10,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.back.dto.ApiResponse;
-import project.back.dto.CartProductDto;
-import project.back.dto.DiscountInfoDto;
-import project.back.dto.ProductAndDiscountDataDto;
-import project.back.entity.*;
+import project.back.dto.product.CartProductDto;
+import project.back.dto.product.DiscountInfoDto;
+import project.back.dto.product.ProductAndDiscountDataDto;
+import project.back.entity.mart.Mart;
+import project.back.entity.member.Member;
+import project.back.entity.product.JoinMart;
+import project.back.entity.product.Product;
 import project.back.etc.commonException.NoContentFoundException;
 import project.back.etc.martproduct.MartAndProductMessage;
-import project.back.repository.*;
-import project.back.repository.memberrepository.MemberRepository;
+import project.back.repository.cart.CartRepository;
+import project.back.repository.mart.MartRepository;
+import project.back.repository.member.MemberRepository;
+import project.back.repository.product.JoinMartRepository;
+import project.back.repository.product.MartProductRepository;
+import project.back.repository.product.ProductRepository;
+import project.back.service.product.MartProductService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,10 +34,18 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MartProductServiceTest {
+    private final Long memberId = 1L;
+    private final Long martAId = 1L;
+    private final Long martBId = 2L;
+    private final Long joinAId = 1L;
+    private final Long joinBId = 3L;
+    private final Long productAId = 1L;
+    private final Long productBId = 2L;
     @Mock
     private MartProductRepository martProductRepository;
     @Mock
@@ -44,17 +60,10 @@ class MartProductServiceTest {
     private MemberRepository memberRepository;
     @InjectMocks
     private MartProductService martProductService;
-
     private Member member;
     private ProductAndDiscountDataDto mockloadData;
     private Map<Long, Long> expectedTotalFinalPrice;
-    private final Long memberId = 1L;
-    private final Long martAId = 1L;
-    private final Long martBId = 2L;
-    private final Long joinAId = 1L;
-    private final Long joinBId = 3L;
-    private final Long productAId = 1L;
-    private final Long productBId = 2L;
+
     @BeforeEach
     void 초기_설정() {
         member = Mockito.mock(Member.class);
@@ -124,11 +133,11 @@ class MartProductServiceTest {
     @Test
     @DisplayName("사용자 정보를 찾을 수 없는 경우")
     void 회원_정보_예외테스트() {
-      when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-      EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-              () -> martProductService.findMartInfoByMartId(martAId, memberId));
-      assertThat(exception.getMessage()).isEqualTo(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage());
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> martProductService.findMartInfoByMartId(martAId, memberId));
+        assertThat(exception.getMessage()).isEqualTo(MartAndProductMessage.NOT_FOUND_MEMBER.getMessage());
     }
 
     @Test

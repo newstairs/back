@@ -16,6 +16,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import project.back.etc.aboutlogin.EntryPointHandler;
 import project.back.etc.aboutlogin.JwtFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -64,9 +66,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOrigin("https://k56733b335962a.user-app.krampoline.com");
+       /* configuration.addAllowedOrigin("https://k56733b335962a.user-app.krampoline.com");
         configuration.addAllowedOrigin("https://k9bceeba41403a.user-app.krampoline.com");
-        configuration.addAllowedOrigin("wss://k9bceeba41403a.user-app.krampoline.com");
+        configuration.addAllowedOrigin("wss://k9bceeba41403a.user-app.krampoline.com");*/
+        //configuration.addAllowedOrigin("http://localhost:3000/login/oauth2/callback/kakao");
+        configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

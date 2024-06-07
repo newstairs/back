@@ -94,7 +94,7 @@ CREATE TABLE `mart_info` (
                              `data_id` bigint NOT NULL AUTO_INCREMENT,
                              `manufacturer` varchar(255) DEFAULT NULL,
                              `product_name` varchar(255) NOT NULL,
-                             `sale_price` varchar(255) NOT NULL,
+                             `sale_price` bigint NOT NULL,
                              `store` varchar(255) NOT NULL,
                              PRIMARY KEY (`data_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1224 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
