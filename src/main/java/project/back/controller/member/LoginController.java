@@ -9,6 +9,7 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -117,13 +118,17 @@ public class LoginController {
     }
 
 
-    @GetMapping("/sendmsgtofriend")
-    public void sendmsgfriend(@RequestBody FriendDataDto friendDataDto, HttpServletRequest req) throws JsonProcessingException {
+    @PostMapping("/sendmsgtofriend")
+    public ResponseEntity<ApiResponse> sendmsgfriend(@RequestBody FriendDataDto friendDataDto, HttpServletRequest req) throws JsonProcessingException {
         ObjectMapper objectMapper=new ObjectMapper();
         String token=req.getHeader("Authorization").substring(7);
         Long id=jwtUtill.getidfromtoken(token);
         List<String> friend_uuid=friendDataDto.getFriend_uuid();
         String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
+
+
+
+        return new ResponseEntity<>(ApiResponse.success(kakao_token,"성공!"),HttpStatus.OK);
         /*String x=webClient.mutate()
                 .baseUrl("https://kapi.kakao.com/v2/api/talk/memo/default/send")
                 .defaultHeader("Content-Type","application/x-www-form-urlencoded")
