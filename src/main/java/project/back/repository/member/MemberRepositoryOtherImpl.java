@@ -45,7 +45,7 @@ public class MemberRepositoryOtherImpl implements MemberRepositoryOther {
     public Long membersave(MemberDto m) {
         Member member=new Member(m.getEmail(),m.getUsername());
         member.setCreate_time(LocalDateTime.now());
-
+        member.setUpdate_time(LocalDateTime.now());
         em.persist(member);
         return member.getMemberId();
     }
