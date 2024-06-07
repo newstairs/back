@@ -33,7 +33,7 @@ public class SecurityConfig {
         return httpSecurity
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                //.cors(c->c.configurationSource(corsConfigurationSource()))
+                .cors(c->c.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize)->{
                     authorize//.requestMatchers("/api1","/code/**","/mypage/**").hasRole("user")

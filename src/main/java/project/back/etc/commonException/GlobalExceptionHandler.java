@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleAllUncaughtException(Exception ex) {
-        return new ResponseEntity<>(ApiResponse.fail("서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(ApiResponse.fail("서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."+ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     /**
