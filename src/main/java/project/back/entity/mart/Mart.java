@@ -18,7 +18,7 @@ public class Mart {
     @Column(name = "mart_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String martName;
 
     @Column(nullable = false)
