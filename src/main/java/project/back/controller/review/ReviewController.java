@@ -1,6 +1,9 @@
 package project.back.controller.review;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.back.dto.ApiResponse;
@@ -18,8 +21,10 @@ public class ReviewController {
 
     //리뷰 + 평점 조회 get
     @GetMapping("/{martId}")
-    public ResponseEntity<ApiResponse<List<ReviewDto>>> getReview(@PathVariable Long martId){
-        List<ReviewDto> reviews = reviewService.getReviewByMartId(martId);
+    public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
+                                                                  @RequestParam(defaultValue = "0") int page){
+        Pageable pageable = PageRequest.of(page,8);
+        Page<ReviewDto> reviews = reviewService.getReviewByMartId(martId, pageable);
         if (reviews.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(false, "No reviews found", null));
         }

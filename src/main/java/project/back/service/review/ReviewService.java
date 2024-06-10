@@ -2,6 +2,8 @@ package project.back.service.review;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.review.ReviewDto;
@@ -25,20 +27,30 @@ public class ReviewService {
     private final MartRepository martRepository;
 
     //review 조회 서비스
-    public List<ReviewDto> getReviewByMartId(Long martId) {
-        List<ReviewDto> reviewDtos = new ArrayList<>();
+    public org.springframework.data.domain.Page<ReviewDto> getReviewByMartId(Long martId, Pageable pageable) {
+        Page<Review> reviews = reviewRepository.findByMart_Id(martId, pageable);
+        return reviews.map(review -> ReviewDto.builder()
+                .reviewId(review.getReviewId())
+                .reviewContent(review.getReviewContent())
+                .memberName(review.getMember().getName())
+                .score(review.getScore())
+                .build());
 
-        List<Review> reviews = reviewRepository.findByMart_Id(martId);
-        for (Review review : reviews) {
-            ReviewDto reviewDto = ReviewDto.builder()
-                    .reviewId(review.getReviewId())
-                    .reviewContent(review.getReviewContent())
-                    .memberName(review.getMember().getName())
-                    .score(review.getScore())
-                    .build();
-            reviewDtos.add(reviewDto);
-        }
-        return reviewDtos;
+//
+//
+//        List<ReviewDto> reviewDtos = new ArrayList<>();
+//
+//        List<Review> reviews = reviewRepository.findByMart_Id(martId, pageable);
+//        for (Review review : reviews) {
+//            ReviewDto reviewDto = ReviewDto.builder()
+//                    .reviewId(review.getReviewId())
+//                    .reviewContent(review.getReviewContent())
+//                    .memberName(review.getMember().getName())
+//                    .score(review.getScore())
+//                    .build();
+//            reviewDtos.add(reviewDto);
+//        }
+//        return reviewDtos;
     }
 
     //review + 평점 작성하기 서비스
