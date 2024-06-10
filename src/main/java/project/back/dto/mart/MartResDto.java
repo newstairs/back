@@ -5,11 +5,13 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class MartDto {
+public class MartResDto {
+    private Long martId;
     private String martName;
     private String martAddress;
 
-    public MartDto(String martName, String martAddress) {
+    public MartResDto(Long martId, String martName, String martAddress) {
+        this.martId = martId;
         this.martName = martName;
         this.martAddress = martAddress;
     }
