@@ -27,7 +27,7 @@ public class MartController {
             @LoginUser Long memberId,
             @RequestBody List<MartReqDto> martDto
     ) {
-        ApiResponse response = martService.saveMart(martDto);
+        ApiResponse<List<MartResDto>> response = martService.saveMart(martDto);
         return ResponseEntity.ok(response);
     }
 }
