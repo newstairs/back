@@ -1,7 +1,10 @@
 package project.back.entity.mart;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import project.back.entity.product.JoinMart;
 
 @Entity
@@ -15,10 +18,10 @@ public class Mart {
     @Column(name = "mart_id")
     private Long id;
 
-    @Column(name = "mart_name", nullable = false)
+    @Column(nullable = false)
     private String martName;
 
-    @Column(name = "mart_address", nullable = false)
+    @Column(nullable = false)
     private String martAddress;
 
     @ManyToOne(fetch = FetchType.LAZY)
