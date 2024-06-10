@@ -9,8 +9,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import project.back.dto.ApiResponse;
+import project.back.dto.cart.ProductSearchDto;
 import project.back.dto.product.ProductDto;
 import project.back.entity.product.Product;
+import project.back.etc.cart.enums.CartMessage;
 import project.back.etc.commonException.NoContentFoundException;
 import project.back.etc.martproduct.MartAndProductMessage;
 import project.back.repository.product.ProductRepository;
@@ -47,6 +49,25 @@ public class ProductService {
     }
 
     /**
+     * 상품 검색
+     *
+     * @param productName 상품이름(String)
+     * @return 상품이름을 포함하는 상품들(과 이미지)
+     * @throws NoContentFoundException productName 을 포함하는 상품이 없는경우
+     */
+    public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
+        List<Product> products = productRepository.findAllByProductNameContaining(productName);
+
+        validateProducts(productName, products);
+
+        List<ProductSearchDto> ProductSearchDtos = products.stream()
+                .map(ProductSearchDto::productToSearchDto)
+                .toList();
+
+        return ApiResponse.success(ProductSearchDtos, CartMessage.SUCCESS_SEARCH.getMessage());
+    }
+
+    /**
      * 이미지를 Base64로 인코딩하고, ProductDto로 반환
      */
     private ProductDto convertToProductDto(Product product) {
@@ -69,6 +90,16 @@ public class ProductService {
             return Base64.getEncoder().encodeToString(imageData);
         } catch (IOException e) {
             throw new RuntimeException(MartAndProductMessage.ERROR_PRODUCT_IMG_PROCESSING.getMessage());
+        }
+    }
+
+    /**
+     * products 검증 메서드
+     */
+    private void validateProducts(String productName, List<Product> products) {
+        if (products.isEmpty()) {
+            throw new NoContentFoundException(
+                    String.format(CartMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
         }
     }
 }
