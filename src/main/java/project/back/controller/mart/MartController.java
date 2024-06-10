@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
-import project.back.dto.mart.MartDto;
+import project.back.dto.mart.MartReqDto;
+import project.back.dto.mart.MartResDto;
 import project.back.service.mart.MartService;
 
 import java.util.List;
@@ -22,7 +23,10 @@ public class MartController {
      * 클라이언트로부터 마트 이름과 주소를 받아서 저장
      */
     @PostMapping("/marts")
-    public ResponseEntity<ApiResponse<List<MartDto>>> saveMarts(@LoginUser Long memberId, @RequestBody List<MartDto> martDto) {
+    public ResponseEntity<ApiResponse<List<MartResDto>>> saveMarts(
+            @LoginUser Long memberId,
+            @RequestBody List<MartReqDto> martDto
+    ) {
         ApiResponse response = martService.saveMart(martDto);
         return ResponseEntity.ok(response);
     }
