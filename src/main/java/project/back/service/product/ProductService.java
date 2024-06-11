@@ -74,7 +74,7 @@ public class ProductService {
      * 이미지 경로로 이미지 URL 생성
      */
     private String getImageUrl(String imagePath) {
-        return "static/images" + (imagePath != null ? imagePath : "/null.png");
+        return "/images" + (imagePath != null ? imagePath : "/null.png");
     }
 
     /**
