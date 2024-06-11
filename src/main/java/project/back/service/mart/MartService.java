@@ -30,14 +30,22 @@ public class MartService {
     public ApiResponse<List<MartResDto>> saveMart(List<MartReqDto> dtos) {
         List<MartResDto> responses = new ArrayList<>();
         for (MartReqDto dto : dtos) {
-            JoinMart joinMart = martRepository.findJoinMartByNameContaining(dto.getMartName()).orElse(null);
-            Mart mart = martRepository.save(Mart.builder()
-                    .martName(dto.getMartName())
-                    .martAddress(dto.getMartAddress())
-                    .joinMart(joinMart)
-                    .build());
-            martRepository.save(mart);
-            responses.add(new MartResDto(mart.getId(), mart.getMartName(), mart.getMartAddress()));
+            Mart findMart = martRepository.findByMartName(dto.getMartName()).orElse(null);
+            if (findMart != null) {
+                responses.add(MartResDto.resDto(
+                        findMart.getId(), findMart.getMartName(), findMart.getMartAddress()));
+            } else {
+                JoinMart joinMart = martRepository.findJoinMartByNameContaining(dto.getMartName()).orElse(null);
+                Mart mart = martRepository.save(Mart.builder()
+                        .martName(dto.getMartName())
+                        .martAddress(dto.getMartAddress())
+                        .joinMart(joinMart)
+                        .build());
+                martRepository.save(mart);
+
+                responses.add(MartResDto.resDto(
+                        mart.getId(), mart.getMartName(), mart.getMartAddress()));
+            }
         }
         return ApiResponse.success(responses, MartAndProductMessage.SAVE_MART.getMessage());
     }
