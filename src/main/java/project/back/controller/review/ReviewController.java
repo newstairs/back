@@ -1,13 +1,15 @@
 package project.back.controller.review;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.back.dto.ApiResponse;
 import project.back.dto.review.ReviewDto;
 import project.back.entity.review.Review;
 import project.back.service.review.ReviewService;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,34 +17,36 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    //리뷰  + 평점 조회 get
-    @GetMapping("/{mart_id}")
-    public ResponseEntity<List<ReviewDto>> getReview(@PathVariable Long mart_id){
-        List<ReviewDto> reviews = reviewService.getReviewByMartId(mart_id);
+    //리뷰 + 평점 조회 get
+    @GetMapping("/{martId}")
+    public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
+                                                                  @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 8);
+        Page<ReviewDto> reviews = reviewService.getReviewByMartId(martId, pageable);
         if (reviews.isEmpty()) {
-            return ResponseEntity.noContent().build(); // 리뷰가 없는 경우 204 No Content 반환
+            return ResponseEntity.ok(new ApiResponse<>(false, "No reviews found", null));
         }
-        return ResponseEntity.ok(reviews); // 리뷰가 있는 경우 리뷰 리스트 반환
+        return ResponseEntity.ok(new ApiResponse<>(true, "Reviews join successfully", reviews));
     }
 
     //리뷰 + 평점 작성 post
     @PostMapping("/")
-    public ResponseEntity<Review> writeReview(@RequestBody ReviewDto reviewDto){
+    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto) {
         Review review = reviewService.writeReview(reviewDto);
-        return ResponseEntity.ok(review);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
     }
 
     //리뷰 + 평점 삭제 delete
-    @DeleteMapping("/{review_id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long review_id){
-        reviewService.deleteReview(review_id);
-        return ResponseEntity.noContent().build(); //삭제 성공시  204 no content 반
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "삭제 완료했습니다.", null));
     }
 
     //리뷰 + 평점 수정 patch
-    @PatchMapping("/{review_id}")
-    public ResponseEntity<ReviewDto> updateReview( @PathVariable Long review_id,@RequestBody ReviewDto reviewDto) {
-        ReviewDto updatedReview = reviewService.updateReview(review_id, reviewDto.getReviewContent(), reviewDto.getScore());
-        return ResponseEntity.ok(updatedReview);
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ApiResponse<ReviewDto>> updateReview(@PathVariable Long reviewId, @RequestBody ReviewDto reviewDto) {
+        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto.getReviewContent(), reviewDto.getScore());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Review updated successfully", updatedReview));
     }
 }
