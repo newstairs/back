@@ -11,8 +11,6 @@ import project.back.dto.review.ReviewDto;
 import project.back.entity.review.Review;
 import project.back.service.review.ReviewService;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
@@ -22,8 +20,8 @@ public class ReviewController {
     //리뷰 + 평점 조회 get
     @GetMapping("/{martId}")
     public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
-                                                                  @RequestParam(defaultValue = "0") int page){
-        Pageable pageable = PageRequest.of(page,8);
+                                                                  @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 8);
         Page<ReviewDto> reviews = reviewService.getReviewByMartId(martId, pageable);
         if (reviews.isEmpty()) {
             return ResponseEntity.ok(new ApiResponse<>(false, "No reviews found", null));
@@ -33,14 +31,14 @@ public class ReviewController {
 
     //리뷰 + 평점 작성 post
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto){
+    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto) {
         Review review = reviewService.writeReview(reviewDto);
         return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
     }
 
     //리뷰 + 평점 삭제 delete
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long reviewId){
+    public ResponseEntity<ApiResponse<Void>> deleteReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
         return ResponseEntity.ok(new ApiResponse<>(true, "삭제 완료했습니다.", null));
     }

@@ -2,11 +2,9 @@ package project.back.controller.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.back.dto.ApiResponse;
+import project.back.dto.cart.ProductSearchDto;
 import project.back.dto.product.ProductDto;
 import project.back.service.product.ProductService;
 
@@ -30,5 +28,17 @@ public class ProductController {
         ApiResponse<List<ProductDto>> productList =
                 productService.findAllProductDtos(page, size);
         return ResponseEntity.ok(productList);
+    }
+
+    /**
+     * [GET] productName 을 포함하는 검색한 모든 재료 검색
+     *
+     * @param productName 상품이름(String)
+     * @return 상품이름을 포함하는 모든 재료
+     */
+    @GetMapping("/{productName}")
+    public ResponseEntity<ApiResponse<List<ProductSearchDto>>> findAllByProductName(@PathVariable String productName) {
+
+        return ResponseEntity.ok(productService.findAllByProductName(productName));
     }
 }

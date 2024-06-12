@@ -26,7 +26,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final MartRepository martRepository;
 
-    //review 조회 서비스
+    //review 조회 서비스 + page처리
     public org.springframework.data.domain.Page<ReviewDto> getReviewByMartId(Long martId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findByMart_Id(martId, pageable);
         return reviews.map(review -> ReviewDto.builder()
@@ -35,26 +35,14 @@ public class ReviewService {
                 .memberName(review.getMember().getName())
                 .score(review.getScore())
                 .build());
-
-//
-//
-//        List<ReviewDto> reviewDtos = new ArrayList<>();
-//
-//        List<Review> reviews = reviewRepository.findByMart_Id(martId, pageable);
-//        for (Review review : reviews) {
-//            ReviewDto reviewDto = ReviewDto.builder()
-//                    .reviewId(review.getReviewId())
-//                    .reviewContent(review.getReviewContent())
-//                    .memberName(review.getMember().getName())
-//                    .score(review.getScore())
-//                    .build();
-//            reviewDtos.add(reviewDto);
-//        }
-//        return reviewDtos;
     }
 
     //review + 평점 작성하기 서비스
     public Review writeReview(ReviewDto reviewDto) {
+        // 필수 필드 검증
+        if (reviewDto.getMemberId() == null || reviewDto.getMartId() == null || reviewDto.getReviewContent() == null || reviewDto.getScore() == null) {
+            throw new IllegalArgumentException("요청 필드가 누락되었습니다.");
+        }
         Member member = memberRepository.findById(reviewDto.getMemberId())
                 .orElseThrow(() -> new EntityNotFoundException("Member not found "));
 

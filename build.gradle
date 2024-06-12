@@ -48,12 +48,13 @@ dependencies {
 	// macOS
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.109.Final:osx-aarch_64'
 
-	//채팅기능추가
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	// flyway
+	implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+jar {
+	enabled = false
 }

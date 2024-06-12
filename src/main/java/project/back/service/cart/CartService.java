@@ -46,24 +46,6 @@ public class CartService {
     }
 
     /**
-     * 상품 검색
-     *
-     * @param productName 상품이름(String)
-     * @return 상품이름을 포함하는 상품들(과 이미지)
-     * @throws NoContentFoundException productName 을 포함하는 상품이 없는경우
-     */
-    public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
-        List<Product> products = productRepository.findAllByProductNameContaining(productName);
-
-        validateProducts(productName, products);
-
-        List<ProductSearchDto> ProductSearchDtos = products.stream()
-                .map(ProductSearchDto::productToSearchDto)
-                .toList();
-
-        return ApiResponse.success(ProductSearchDtos, CartMessage.SUCCESS_SEARCH.getMessage());
-    }
-    /**
      * 상품을 장바구니에 저장(등록)
      *
      * @param cartDto  카트에 담길 상품 정보(productId를 가진 객체)
@@ -225,13 +207,6 @@ public class CartService {
         return cartRepository.findByMemberEquals(member).stream()
                 .map(CartDto::CartToDto)
                 .toList();
-    }
-    // products 검증 메서드
-    private void validateProducts(String productName, List<Product> products) {
-        if (products.isEmpty()) {
-            throw new NoContentFoundException(
-                    String.format(CartMessage.NOT_EXIST_PRODUCT.getMessage(), productName));
-        }
     }
     // addProduct 시 이미 cart 에 존재하는 객체인지 검증하는 메서드
     private void checkAlreadyExist(Member member, Product product) {

@@ -24,4 +24,6 @@ public interface MartRepository extends JpaRepository<Mart, Long> {
     Optional<Long> findJoinIdByMartId(Long martId);
 
     List<Mart> findByJoinMartJoinId(Long joinId);
+
+    Optional<Mart> findByMartName(String martName);
 }
