@@ -1,6 +1,7 @@
 package project.back.controller.review;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import project.back.service.review.ReviewService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
+@Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -21,6 +23,9 @@ public class ReviewController {
     @GetMapping("/{martId}")
     public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
                                                                   @RequestParam(defaultValue = "0") int page) {
+
+
+        log.info("여기까지 도달햇나????:{} {}",martId,page);
         Pageable pageable = PageRequest.of(page, 8);
         Page<ReviewDto> reviews = reviewService.getReviewByMartId(martId, pageable);
         if (reviews.isEmpty()) {
