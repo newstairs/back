@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.cart.CartDto;
-import project.back.dto.cart.ProductSearchDto;
 import project.back.service.cart.CartService;
 
 @Validated

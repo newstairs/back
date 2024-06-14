@@ -3,23 +3,19 @@ package project.back.service.cart;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
 import project.back.dto.cart.CartDto;
-import project.back.dto.cart.ProductSearchDto;
 import project.back.entity.cart.Cart;
 import project.back.entity.member.Member;
 import project.back.entity.product.Product;
 import project.back.etc.commonException.ConflictException;
-import project.back.etc.commonException.NoContentFoundException;
 import project.back.etc.cart.enums.CartMessage;
 import project.back.repository.cart.CartRepository;
 import project.back.repository.product.ProductRepository;
 import project.back.repository.member.MemberRepository;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CartService {
