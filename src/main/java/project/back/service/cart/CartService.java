@@ -50,12 +50,12 @@ public class CartService {
      *
      * @param cartDto  카트에 담길 상품 정보(productId를 가진 객체)
      * @param memberId 유저정보를 가져오기위한 memberId
-     * @return 장바구니 목록(CartDto)
+     * @return 저장 성공 메시지
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우
      * @throws ConflictException       같은 상품이 이미 담겨있는 경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> addProduct(CartDto cartDto, Long memberId) {
+    public ApiResponse<CartDto> addProduct(CartDto cartDto, Long memberId) {
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(cartDto.getProductId());
 
@@ -69,8 +69,6 @@ public class CartService {
 
         cartRepository.save(cart);
 
-//        List<CartDto> cartDtos = getCartDtoListByMember(member);
-
         return ApiResponse.success(null,
                 String.format(CartMessage.SUCCESS_ADD.getMessage(), cart.getProduct().getProductName())
         );
@@ -80,7 +78,7 @@ public class CartService {
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 변경된 후의 상품 객체(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)와 메시지
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "직접입력"한 값이 1보다 작은 경우
      */
@@ -101,7 +99,7 @@ public class CartService {
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 변경된 후의 상품 객체(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)와 메시지
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      */
     @Transactional
@@ -121,7 +119,7 @@ public class CartService {
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 변경된 후의 상품 객체(CartDto)
+     * @return 변경된 후의 상품 객체(CartDto)와 메시지
      * @throws EntityNotFoundException  사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      * @throws IllegalArgumentException "-"한 값이 0이하인 경우
      */
@@ -142,19 +140,16 @@ public class CartService {
      *
      * @param productId 상품 고유번호
      * @param memberId  사용자 고유번호
-     * @return 장바구니 목록
+     * @return 상품 삭제 메시지
      * @throws EntityNotFoundException 사용자 정보나 상품 정보를 찾을 수 없는 경우, 장바구니에 해당 상품이 존재하지 않는경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> deleteProduct(Long productId, Long memberId) {
+    public ApiResponse<CartDto> deleteProduct(Long productId, Long memberId) {
         Member member = getMemberByMemberId(memberId);
         Product product = getProductByProductId(productId);
         Cart cart = getCartByMemberAndProduct(member, product);
 
         cartRepository.delete(cart);
-
-//        List<CartDto> cartDtos = getCartDtoListByMember(member);
-
 
         return ApiResponse.success(null,
                 String.format(CartMessage.SUCCESS_DELETE.getMessage(), cart.getProduct().getProductName()));
@@ -164,15 +159,13 @@ public class CartService {
      * 장바구니 상품 삭제 (전체)
      *
      * @param memberId 사용자 고유번호
-     * @return 빈 장바구니 목록
+     * @return 전체 상품 삭제 메시지
      * @throws EntityNotFoundException 사용자 정보를 찾을 수 없는 경우
      */
     @Transactional
-    public ApiResponse<List<CartDto>> deleteAllProduct(Long memberId) {
+    public ApiResponse<CartDto> deleteAllProduct(Long memberId) {
         Member member = getMemberByMemberId(memberId);
         cartRepository.deleteAllByMember(member);
-
-//        List<CartDto> cartDtos = getCartDtoListByMember(member);
 
         return ApiResponse.success(null, CartMessage.SUCCESS_DELETE_ALL.getMessage());
     }
