@@ -21,23 +21,23 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @Slf4j
 public class WebClientConfig {
-    @Value("${cloud.host.url}")
-    private String proxyHost;
+    //@Value("${cloud.host.url}")
+    //private String proxyHost;
 
-    @Value("${cloud.host.port}")
-    private int proxyPort;
+    //@Value("${cloud.host.port}")
+    //private int proxyPort;
 
     @Bean
     public WebClient webClient(){
 
         HttpClient httpClient=HttpClient.create()
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,0)
-                .responseTimeout(Duration.ofMillis(500))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,1000)
+                .responseTimeout(Duration.ofMillis(1000))
                 .doOnConnected(connection -> {
-                    connection.addHandlerFirst(new ReadTimeoutHandler(500, TimeUnit.MILLISECONDS))
-                            .addHandlerLast(new WriteTimeoutHandler(500,TimeUnit.MILLISECONDS));
-                })
-                .proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
+                    connection.addHandlerFirst(new ReadTimeoutHandler(1000, TimeUnit.MILLISECONDS))
+                            .addHandlerLast(new WriteTimeoutHandler(1000,TimeUnit.MILLISECONDS));
+                });
+        //proxy(proxy -> proxy.type(ProxyProvider.Proxy.HTTP).host(proxyHost).port(proxyPort));
 
         WebClient webClient=WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))

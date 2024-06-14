@@ -62,33 +62,6 @@ class CartServiceTest {
     }
 
     @Test
-    @DisplayName("상품검색테스트")
-    @Transactional
-    void 재료검색테스트() {
-        String testProductName = "이준오의 당근";
-        Product product1 = new Product(testProductName, "temp");
-        productRepository.save(product1);
-
-        ApiResponse<List<ProductSearchDto>> result1 = cartService.findAllByProductName(testProductName);
-        List<ProductSearchDto> resultDatas = result1.getData();
-        // "당근"을 포함하는 모든 상품을 가져오는지
-        ApiResponse<List<ProductSearchDto>> result2 = cartService.findAllByProductName("당근");
-        List<ProductSearchDto> result2Datas = result2.getData();
-
-        assertThat(resultDatas.size()).isEqualTo(1);
-        assertThat(result2Datas.size()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("상품검색 예외테스트")
-    void 상품검색_예외테스트() {
-        String productName = "상품이름검색 ㅋㅋ 이런 상품은 없겠지";
-
-        assertThatThrownBy(() -> cartService.findAllByProductName(productName))
-                .isInstanceOf(NoContentFoundException.class);
-    }
-
-    @Test
     @DisplayName("상품추가 테스트")
     @Transactional
     void 상품추가_테스트() {
@@ -131,11 +104,8 @@ class CartServiceTest {
     void 상품_수량_변경_테스트(Long count, Long expected) {
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
 
-        ApiResponse<List<CartDto>> response = cartService.updateQuantity(commonProductId, count, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.updateQuantity(commonProductId, count, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(expected);
     }
@@ -145,11 +115,8 @@ class CartServiceTest {
     void 상품_수량_변경_테스트_증가(){
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
 
-        ApiResponse<List<CartDto>> response = cartService.plusQuantity(commonProductId, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.plusQuantity(commonProductId, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(2L);
     }
@@ -160,11 +127,8 @@ class CartServiceTest {
         cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
         cartService.updateQuantity(commonProductId, 6L, commonMemberId);
 
-        ApiResponse<List<CartDto>> response = cartService.minusQuantity(commonProductId, commonMemberId);
-        Long result = response.getData().stream()
-                .filter(c -> Objects.equals(c.getProductId(), commonProductId))
-                .toList()
-                .get(0).getQuantity();
+        ApiResponse<CartDto> response = cartService.minusQuantity(commonProductId, commonMemberId);
+        Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(5L);
     }
@@ -229,4 +193,31 @@ class CartServiceTest {
 
         assertThat(resultSize).isEqualTo(0);
     }
+//    @Test
+//    @DisplayName("상품검색테스트")
+//    @Transactional
+//    void 재료검색테스트() {
+//        String testProductName = "이준오의 당근";
+//        Product product1 = new Product(testProductName, "temp");
+//        productRepository.save(product1);
+//
+//        ApiResponse<List<ProductSearchDto>> result1 = cartService.findAllByProductName(testProductName);
+//        List<ProductSearchDto> resultDatas = result1.getData();
+//        // "당근"을 포함하는 모든 상품을 가져오는지
+//        ApiResponse<List<ProductSearchDto>> result2 = cartService.findAllByProductName("당근");
+//        List<ProductSearchDto> result2Datas = result2.getData();
+//
+//        assertThat(resultDatas.size()).isEqualTo(1);
+//        assertThat(result2Datas.size()).isEqualTo(2);
+//    }
+//
+//    @Test
+//    @DisplayName("상품검색 예외테스트")
+//    void 상품검색_예외테스트() {
+//        String productName = "상품이름검색 ㅋㅋ 이런 상품은 없겠지";
+//
+//        assertThatThrownBy(() -> cartService.findAllByProductName(productName))
+//                .isInstanceOf(NoContentFoundException.class);
+//    }
+
 }

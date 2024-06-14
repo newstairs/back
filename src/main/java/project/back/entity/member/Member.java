@@ -29,5 +29,6 @@ public class Member extends UpdateCreateTime {
     public Member(String email, String name) {
         this.email = email;
         this.name = name;
+
     }
 }
