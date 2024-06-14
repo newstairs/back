@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class ReviewDto {
+    private Long reviewId;
     private String reviewContent;
     private BigDecimal score;
     private String memberName;
@@ -16,8 +17,8 @@ public class ReviewDto {
     private Long martId; // 리뷰 대상인 마트의 ID
 
     @Builder
-
-    public ReviewDto(String reviewContent, BigDecimal score, String memberName, Long memberId, Long martId) {
+    public ReviewDto(Long reviewId, String reviewContent, BigDecimal score, String memberName, Long memberId, Long martId) {
+        this.reviewId = reviewId;
         this.reviewContent = reviewContent;
         this.score = score;
         this.memberName = memberName;
