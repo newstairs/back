@@ -5,7 +5,3 @@ resources:
   - ingress.yaml
   - mysql.yaml
   - secret.yaml
-configMapGenerator:
-  - name: init-db
-    files:
-      - configs/init.sql
