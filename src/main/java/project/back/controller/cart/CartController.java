@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.cart.CartDto;
-import project.back.dto.cart.ProductSearchDto;
 import project.back.service.cart.CartService;
 
 @Validated
@@ -45,10 +44,10 @@ public class CartController {
      *
      * @param cartDto  (productId)
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 저장된 상품에 대한 객체(productId, quantity)와 상품이름
+     * @return 저장 성공 메시지
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<List<CartDto>>> addProduct(
+    public ResponseEntity<ApiResponse<CartDto>> addProduct(
             @RequestBody CartDto cartDto,
             @LoginUser Long memberId) {
 
@@ -60,7 +59,7 @@ public class CartController {
      *
      * @param productId 상품 고유번호
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 장바구니 목록
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/plus/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> plusQuantity(
@@ -75,7 +74,7 @@ public class CartController {
      *
      * @param productId 상품 고유번호
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 장바구니 목록
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/minus/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> minusQuantity(
@@ -90,7 +89,7 @@ public class CartController {
      *
      * @param productId 상품 고유번호
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 장바구니 목록
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/{count}/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> updateQuantity(
@@ -106,10 +105,10 @@ public class CartController {
      *
      * @param productId 상품 고유번호
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 장바구니 목록
+     * @return 상품삭제 성공 메시지
      */
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> deleteProduct(
+    public ResponseEntity<ApiResponse<CartDto>> deleteProduct(
             @PathVariable Long productId,
             @LoginUser Long memberId) {
 
@@ -120,10 +119,10 @@ public class CartController {
      * [DELETE] 장바구니 상품 삭제 (전체)
      *
      * @param memberId request JWT 토큰 내부의 사용자 Id값
-     * @return 빈 장바구니 목록
+     * @return 상품삭제 성공 메시지
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<List<CartDto>>> deleteAllProduct(@LoginUser Long memberId) {
+    public ResponseEntity<ApiResponse<CartDto>> deleteAllProduct(@LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.deleteAllProduct(memberId));
     }

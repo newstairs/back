@@ -17,6 +17,10 @@ import project.back.etc.cart.enums.CartMessage;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart {
+
+    private static final int UPDATE_MINIMUM_QUANTITY = 1;
+    private static final int MINUS_MINIMUM_QUANTITY = 2;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cart_id")
@@ -38,7 +42,7 @@ public class Cart {
     }
 
     public void minusQuantity() {
-        if (this.quantity < 2) {
+        if (this.quantity < MINUS_MINIMUM_QUANTITY) {
             throw new IllegalArgumentException(
                     CartMessage.QUANTITY_ONE_OR_MORE.getMessage() + CartMessage.DELETE_RECOMMEND.getMessage()
             );
@@ -47,7 +51,7 @@ public class Cart {
     }
 
     public void updateQuantity(Long quantity) {
-        if (quantity < 1) {
+        if (quantity < UPDATE_MINIMUM_QUANTITY) {
             throw new IllegalArgumentException(CartMessage.QUANTITY_ONE_OR_MORE.getMessage());
         }
         this.quantity = quantity;

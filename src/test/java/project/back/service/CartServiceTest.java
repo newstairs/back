@@ -1,61 +1,93 @@
 package project.back.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import project.back.dto.ApiResponse;
 import project.back.dto.cart.CartDto;
-import project.back.dto.cart.ProductSearchDto;
+import project.back.entity.cart.Cart;
+import project.back.entity.member.Member;
 import project.back.entity.product.Product;
+import project.back.etc.cart.enums.CartMessage;
 import project.back.etc.commonException.ConflictException;
-import project.back.etc.commonException.NoContentFoundException;
+import project.back.repository.cart.CartRepository;
+import project.back.repository.member.MemberRepository;
 import project.back.repository.product.ProductRepository;
 import project.back.service.cart.CartService;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class CartServiceTest {
 
-    @Autowired
+    @Mock
+    CartRepository cartRepository;
+    @Mock
+    MemberRepository memberRepository;
+    @Mock
     ProductRepository productRepository;
-    @Autowired
+
+    @InjectMocks
     CartService cartService;
 
-    private Long commonMemberId;
-    private Long commonProductId;
-    private CartDto commonCartDto;
+    private static final Long COMMON_NUMBER = 1L;
+    private static final String TEST_PRODUCT_NAME = "테스트 상품1";
+
+    private Long memberId;
+    private Long productId;
+    private CartDto cartDto;
+    private Member member;
+    private Product product;
+    private Cart cart;
 
     @BeforeEach
     void setUp() {
-        commonMemberId = 1L;
-        commonProductId = 1L;
-        commonCartDto = CartDto.builder()
-                .productId(commonProductId)
+        memberId = COMMON_NUMBER;
+        productId = COMMON_NUMBER;
+        cartDto = CartDto.builder()
+                .productId(productId)
+                .productName(TEST_PRODUCT_NAME)
                 .build();
+        product = Product.builder()
+                .productId(productId)
+                .productName(TEST_PRODUCT_NAME)
+                .build();
+        cart = Cart.builder()
+                .cartId(COMMON_NUMBER)
+                .member(member)
+                .product(product)
+                .quantity(COMMON_NUMBER)
+                .build();
+        member = new Member();
+        member.setMemberId(memberId);
     }
 
     @Test
     @DisplayName("장바구니 조회 테스트")
     void 장바구니_조회_테스트() {
-        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(commonMemberId);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(cartRepository.findByMemberEquals(member)).thenReturn(Arrays.asList(cart));
 
-        assertThat(result.getData()).isNotNull();
+        ApiResponse<List<CartDto>> result = cartService.getCartsByMemberId(memberId);
+        assertThat(result.getData().size()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("장바구니 조회 예외 테스트")
     void 장바구니_조회_예외_테스트_EntityNotFoundException() {
-        Long memberId = 1000L;
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> cartService.getCartsByMemberId(memberId))
                 .isInstanceOf(EntityNotFoundException.class);
@@ -63,24 +95,30 @@ class CartServiceTest {
 
     @Test
     @DisplayName("상품추가 테스트")
-    @Transactional
     void 상품추가_테스트() {
-        ApiResponse<List<CartDto>> result = cartService.addProduct(commonCartDto, commonMemberId);
-        CartDto addedProduct = result.getData().stream()
-                .filter(c -> c.getProductId() == commonProductId)
-                .toList()
-                .get(0);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.empty());
 
-        assertThat(addedProduct).isNotNull();
+        ApiResponse<CartDto> result = cartService.addProduct(cartDto, memberId);
+
+        String expectMessage = String.format(CartMessage.SUCCESS_ADD.getMessage(), TEST_PRODUCT_NAME);
+        assertThat(result.getMessage()).isEqualTo(expectMessage);
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"1000,1", "1,10000"})
-    @DisplayName("상품추가 예외테스트: 사용자 없음(1000), 상품 없음(10000) ")
-    void 상품추가_예외테스트_EntityNotFoundException(Long memberId, Long productId) {
-        CartDto cartDto = CartDto.builder()
-                .productId(productId)
-                .build();
+    @Test
+    @DisplayName("상품추가 예외테스트: 사용자 없음")
+    void 상품추가_예외테스트_사용자없음_EntityNotFoundException() {
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+    @Test
+    @DisplayName("상품추가 예외테스트: 상품 없음")
+    void 상품추가_예외테스트_상품없음_EntityNotFoundException(){
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
@@ -88,11 +126,13 @@ class CartServiceTest {
 
     @Test
     @DisplayName("상품추가 예외테스트: 중복된 상품")
-    @Transactional
     void 상품추가_예외테스트_중복된_상품_ConflictException() {
-        cartService.addProduct(commonCartDto, commonMemberId); // 첫번째 저장
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        // 이미 존재하는 상황가정
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
 
-        assertThatThrownBy(() -> cartService.addProduct(commonCartDto, commonMemberId)) // 두번째 저장 -> ConflictException
+        assertThatThrownBy(() -> cartService.addProduct(cartDto, memberId))
                 .isInstanceOf(ConflictException.class);
 
     }
@@ -100,34 +140,43 @@ class CartServiceTest {
     @ParameterizedTest
     @DisplayName("상품 수량 변경 테스트(직접입력)")
     @CsvSource(value = {"6, 6", "5, 5", "1, 1"})
-    @Transactional
     void 상품_수량_변경_테스트(Long count, Long expected) {
-        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
 
-        ApiResponse<CartDto> response = cartService.updateQuantity(commonProductId, count, commonMemberId);
+        ApiResponse<CartDto> response = cartService.updateQuantity(productId, count, memberId);
         Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(expected);
     }
+
     @Test
     @DisplayName("상품 수량 변경 테스트(증가)")
-    @Transactional
     void 상품_수량_변경_테스트_증가(){
-        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
 
-        ApiResponse<CartDto> response = cartService.plusQuantity(commonProductId, commonMemberId);
+        ApiResponse<CartDto> response = cartService.plusQuantity(productId, memberId);
         Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(2L);
     }
     @Test
     @DisplayName("상품 수량 변경 테스트(감소)")
-    @Transactional
     void 상품_수량_변경_테스트_감소(){
-        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가
-        cartService.updateQuantity(commonProductId, 6L, commonMemberId);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        Cart customCart = Cart.builder()
+                .cartId(COMMON_NUMBER)
+                .member(member)
+                .product(product)
+                .quantity(6L)
+                .build();
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(customCart));
 
-        ApiResponse<CartDto> response = cartService.minusQuantity(commonProductId, commonMemberId);
+        ApiResponse<CartDto> response = cartService.minusQuantity(productId, memberId);
         Long result = response.getData().getQuantity();
 
         assertThat(result).isEqualTo(5L);
@@ -136,28 +185,34 @@ class CartServiceTest {
     @ParameterizedTest
     @ValueSource(longs = {0, -1, -2})
     @DisplayName("상품 수량 변경(직접입력) 예외 테스트: 직접입력한 값이 0이하인 경우")
-    @Transactional
     void 상품_수량_변경_예외_테스트_직접입력_IllegalArgumentException(Long count) {
-        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가, quantity=1
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
 
-        assertThatThrownBy(() -> cartService.updateQuantity(commonProductId, count, commonMemberId))
+        assertThatThrownBy(() -> cartService.updateQuantity(productId, count, memberId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
     @Test
     @DisplayName("상품 수량 변경(감소) 예외 테스트: -한 값이 0 인 경우")
-    @Transactional
     void 상품_수량_변경_예외_테스트_감소_IllegalArgumentException(){
-        cartService.addProduct(commonCartDto, commonMemberId); // 장바구니에 1L인 상품추가, quantity=1
-        assertThatThrownBy(() -> cartService.minusQuantity(commonProductId, commonMemberId))
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
+
+        assertThatThrownBy(() -> cartService.minusQuantity(productId, memberId))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-    @ParameterizedTest
-    @CsvSource(value = {"3,1", "1,1000", "1,1"})
-    @DisplayName("상품 수량 변경 예외 테스트: 사용자 없음, 상품 없음, 장바구니에 해당 상품없음")
-    @Transactional
-    void 상품_수량_변경_예외_테스트_EntityNotFoundException(Long memberId, Long productId) {
-        Long count = 1L;
-        assertThatThrownBy(() -> cartService.updateQuantity(productId, count, memberId))
+
+    @Test
+    @DisplayName("상품 수량 변경 예외 테스트: 장바구니에 해당 상품없음")
+    void 상품_수량_변경_예외_테스트_EntityNotFoundException() {
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cartService.updateQuantity(productId, 1L, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
         assertThatThrownBy(() -> cartService.plusQuantity(productId, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
@@ -167,57 +222,36 @@ class CartServiceTest {
 
     @Test
     @DisplayName("(개별)상품 삭제 테스트")
-    @Transactional
     void 개별_상품_삭제_테스트() {
-        cartService.addProduct(commonCartDto, commonMemberId);
-        int beforeSize = cartService.getCartsByMemberId(commonMemberId).getData().size();
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.ofNullable(cart));
 
-        int afterSize = cartService.deleteProduct(commonProductId, commonMemberId).getData().size();
+        ApiResponse<CartDto> result = cartService.deleteProduct(productId, memberId);
+        String expectMessage = String.format(CartMessage.SUCCESS_DELETE.getMessage(), TEST_PRODUCT_NAME);
 
-        assertThat(afterSize).isEqualTo(beforeSize - 1);
+        assertThat(result.getMessage()).isEqualTo(expectMessage);
     }
 
     @Test
     @DisplayName("(개별)상품 삭제 예외 테스트: 해당 상품이 장바구니에 없는경우")
-    @Transactional
     void 개별_상품_삭제_예외_테스트_EntityNotFoundException() {
-        assertThatThrownBy(() -> cartService.deleteProduct(commonProductId, commonMemberId))
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
+        when(productRepository.findById(productId)).thenReturn(Optional.ofNullable(product));
+        when(cartRepository.findByMemberEqualsAndProductEquals(member, product)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> cartService.deleteProduct(productId, memberId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
     @DisplayName("(전체)상품 삭제 테스트")
-    @Transactional
     void 전체_상품_삭제_테스트() {
-        int resultSize = cartService.deleteAllProduct(commonMemberId).getData().size();
+        when(memberRepository.findById(memberId)).thenReturn(Optional.ofNullable(member));
 
-        assertThat(resultSize).isEqualTo(0);
+        ApiResponse<CartDto> result = cartService.deleteAllProduct(memberId);
+
+        assertThat(result.getMessage()).isEqualTo(CartMessage.SUCCESS_DELETE_ALL.getMessage());
+
     }
-//    @Test
-//    @DisplayName("상품검색테스트")
-//    @Transactional
-//    void 재료검색테스트() {
-//        String testProductName = "이준오의 당근";
-//        Product product1 = new Product(testProductName, "temp");
-//        productRepository.save(product1);
-//
-//        ApiResponse<List<ProductSearchDto>> result1 = cartService.findAllByProductName(testProductName);
-//        List<ProductSearchDto> resultDatas = result1.getData();
-//        // "당근"을 포함하는 모든 상품을 가져오는지
-//        ApiResponse<List<ProductSearchDto>> result2 = cartService.findAllByProductName("당근");
-//        List<ProductSearchDto> result2Datas = result2.getData();
-//
-//        assertThat(resultDatas.size()).isEqualTo(1);
-//        assertThat(result2Datas.size()).isEqualTo(2);
-//    }
-//
-//    @Test
-//    @DisplayName("상품검색 예외테스트")
-//    void 상품검색_예외테스트() {
-//        String productName = "상품이름검색 ㅋㅋ 이런 상품은 없겠지";
-//
-//        assertThatThrownBy(() -> cartService.findAllByProductName(productName))
-//                .isInstanceOf(NoContentFoundException.class);
-//    }
-
 }
