@@ -12,6 +12,9 @@ import project.back.etc.aboutlogin.JwtUtill;
 @RequiredArgsConstructor
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final int TOKEN_PREFIX_LENGTH = 7;
+
     private final JwtUtill jwtUtil;
 
     @Override
@@ -23,7 +26,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String token = request.getHeader("Authorization").substring(7);
+        String token = request.getHeader(AUTHORIZATION_HEADER).substring(TOKEN_PREFIX_LENGTH);
         return jwtUtil.getidfromtoken(token);
     }
 }

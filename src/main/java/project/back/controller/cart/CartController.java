@@ -1,6 +1,5 @@
 package project.back.controller.cart;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.cart.CartDto;
-import project.back.dto.cart.ProductSearchDto;
-import project.back.etc.RequestMemberMapper;
 import project.back.service.cart.CartService;
 
 @Validated
@@ -27,47 +25,31 @@ import project.back.service.cart.CartService;
 public class CartController {
 
     private final CartService cartService;
-    private final RequestMemberMapper requestMemberMapper;
 
     private static final String INVALID_QUANTITY_MESSAGE = "1 이상의 숫자만 입력해주세요";
+
     /**
      * [GET] 장바구니 목록 조회
      *
-     * @param request 유저정보를 포함하고있는 HttpServletRequest
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
      * @return 장바구니 목록
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CartDto>>> getCart(HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
-
+    public ResponseEntity<ApiResponse<List<CartDto>>> getCart(@LoginUser Long memberId) {
         return ResponseEntity.ok(cartService.getCartsByMemberId(memberId));
-    }
-
-    /**
-     * [GET] productName 을 포함하는 검색한 모든 재료 검색
-     *
-     * @param productName 상품이름(String)
-     * @return 상품이름을 포함하는 모든 재료
-     */
-    @GetMapping("/{productName}")
-    public ResponseEntity<ApiResponse<List<ProductSearchDto>>> findAllByProductName(@PathVariable String productName) {
-
-        return ResponseEntity.ok(cartService.findAllByProductName(productName));
     }
 
     /**
      * [POST] 장바구니에 상품추가
      *
-     * @param cartDto (productId)
-     * @param request 유저정보를 포함하고있는 HttpServletRequest
-     * @return 저장된 상품에 대한 객체(productId, quantity)와 상품이름
+     * @param cartDto  (productId)
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 저장 성공 메시지
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<List<CartDto>>> addProduct(
+    public ResponseEntity<ApiResponse<CartDto>> addProduct(
             @RequestBody CartDto cartDto,
-            HttpServletRequest request) {
-        // TODO: JwtUtil 자체에서 해결하도록 해보자
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+            @LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.addProduct(cartDto, memberId));
     }
@@ -76,14 +58,13 @@ public class CartController {
      * [PATCH] 장바구니의 특정 상품 수량 증가(버튼)
      *
      * @param productId 상품 고유번호
-     * @param request   유저정보를 포함하고있는 HttpServletRequest
-     * @return 장바구니 목록
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/plus/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> plusQuantity(
+    public ResponseEntity<ApiResponse<CartDto>> plusQuantity(
             @PathVariable Long productId,
-            HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+            @LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.plusQuantity(productId, memberId));
     }
@@ -92,14 +73,13 @@ public class CartController {
      * [PATCH] 장바구니의 특정 상품 수량 감소(버튼)
      *
      * @param productId 상품 고유번호
-     * @param request   유저정보를 포함하고있는 HttpServletRequest
-     * @return 장바구니 목록
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/minus/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> minusQuantity(
+    public ResponseEntity<ApiResponse<CartDto>> minusQuantity(
             @PathVariable Long productId,
-            HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+            @LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.minusQuantity(productId, memberId));
     }
@@ -108,15 +88,14 @@ public class CartController {
      * [PATCH] 장바구니의 특정 상품 수량 변경(직접입력)
      *
      * @param productId 상품 고유번호
-     * @param request   유저정보를 포함하고있는 HttpServletRequest
-     * @return 장바구니 목록
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 수정된 객체와 메시지
      */
     @PatchMapping("/{count}/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> updateQuantity(
+    public ResponseEntity<ApiResponse<CartDto>> updateQuantity(
             @Min(value = 1, message = INVALID_QUANTITY_MESSAGE) @PathVariable Long count,
             @PathVariable Long productId,
-            HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+            @LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.updateQuantity(productId, count, memberId));
     }
@@ -125,14 +104,13 @@ public class CartController {
      * [DELETE] 장바구니 상품 삭제 (개별)
      *
      * @param productId 상품 고유번호
-     * @param request   유저정보를 포함하고있는 HttpServletRequest
-     * @return 장바구니 목록
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 상품삭제 성공 메시지
      */
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponse<List<CartDto>>> deleteProduct(
+    public ResponseEntity<ApiResponse<CartDto>> deleteProduct(
             @PathVariable Long productId,
-            HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+            @LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.deleteProduct(productId, memberId));
     }
@@ -140,12 +118,11 @@ public class CartController {
     /**
      * [DELETE] 장바구니 상품 삭제 (전체)
      *
-     * @param request 유저정보를 포함하고있는 HttpServletRequest
-     * @return 빈 장바구니 목록
+     * @param memberId request JWT 토큰 내부의 사용자 Id값
+     * @return 상품삭제 성공 메시지
      */
     @DeleteMapping
-    public ResponseEntity<ApiResponse<List<CartDto>>> deleteAllProduct(HttpServletRequest request) {
-        Long memberId = requestMemberMapper.RequestToMemberId(request);
+    public ResponseEntity<ApiResponse<CartDto>> deleteAllProduct(@LoginUser Long memberId) {
 
         return ResponseEntity.ok(cartService.deleteAllProduct(memberId));
     }
