@@ -8,8 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.back.dto.ApiResponse;
+import project.back.dto.recipe.ManualResDto;
 import project.back.dto.recipe.RecipeListDto;
-import project.back.dto.recipe.RecipeManualDto;
 import project.back.dto.recipe.RecipePartsDto;
 import project.back.dto.recipe.RecipeResponseDto;
 import project.back.entity.recipe.Recipe;
@@ -72,9 +72,9 @@ public class RecipeCommonService {
     public ApiResponse<RecipeResponseDto> getRecipeId(Long recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new EntityNotFoundException(RecipeMessage.NOT_FOUND_RECIPE.getMessage()));
-        List<RecipeManualDto> manualList = manualRepository.findByRecipeRecipeId(recipeId)
+        List<ManualResDto> manualList = manualRepository.findByRecipeRecipeId(recipeId)
                 .stream()
-                .map(RecipeManualDto::manualDto)
+                .map(ManualResDto::manualResDto)
                 .toList();
 
         List<RecipePartsDto> partsList = partsRepository.findByRecipeRecipeId(recipeId)

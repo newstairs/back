@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import project.back.dto.recipe.RecipeManualDto;
+import project.back.dto.recipe.ManualReqDto;
 import project.back.dto.recipe.RecipePartsDto;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class RecipeApiProcessingDto {
     @JsonProperty("RCP_PARTS_DTLS")
     private String recipeParts;
 
-    private List<RecipeManualDto> manual = new ArrayList<>();
+    private List<ManualReqDto> manual = new ArrayList<>();
 
     @JsonProperty("RCP_NA_TIP")
     private String recipeTip;
@@ -40,9 +40,9 @@ public class RecipeApiProcessingDto {
             int step = Integer.parseInt(key.replaceAll("[^0-9]", ""));
             if (value != null && !value.toString().isEmpty()) {
                 while (manual.size() < step) {
-                    manual.add(new RecipeManualDto());
+                    manual.add(new ManualReqDto());
                 }
-                RecipeManualDto manualDto = manual.get(step - 1);
+                ManualReqDto manualDto = manual.get(step - 1);
                 manualDto.setStep(step);
                 if (key.startsWith("MANUAL_IMG")) {
                     manual.get(step - 1).setManualImgUrl(value.toString());

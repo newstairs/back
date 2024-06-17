@@ -12,11 +12,11 @@ public class RecipeRequestDto {
     private String recipeName;
     private String recipeType;
     private String recipeTip;
-    private List<RecipeManualDto> recipeManualList;
+    private List<ManualResDto> recipeManualList;
     private List<RecipePartsDto> recipePartsList;
 
     @Builder
-    public RecipeRequestDto(String recipeName, String recipeType, String recipeTip, List<RecipeManualDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
+    public RecipeRequestDto(String recipeName, String recipeType, String recipeTip, List<ManualResDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
         this.recipeName = recipeName;
         this.recipeType = recipeType;
         this.recipeTip = recipeTip;

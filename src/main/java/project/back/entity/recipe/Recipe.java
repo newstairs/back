@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.back.entity.member.Member;
 
 import java.util.List;
 
@@ -33,13 +34,18 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RecipeParts> recipeParts;
 
-    @Builder
-    public Recipe(Long recipeApiNo, String recipeName, String recipeType, String recipeTip, List<RecipeManual> recipeManual, List<RecipeParts> recipeParts) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = true)
+    private Member member;
+
+    @Builder(toBuilder = true)
+    public Recipe(Long recipeApiNo, String recipeName, String recipeType, String recipeTip, List<RecipeManual> recipeManual, List<RecipeParts> recipeParts, Member member) {
         this.recipeApiNo = recipeApiNo;
         this.recipeName = recipeName;
         this.recipeType = recipeType;
         this.recipeTip = recipeTip;
         this.recipeManual = recipeManual;
         this.recipeParts = recipeParts;
+        this.member = member;
     }
 }

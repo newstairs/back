@@ -18,6 +18,8 @@ public class RecipeApiController {
 
     private final RecipeApiService recipeService;
 
+    // TODO. End Point 설정 관련 수정
+
     /**
      * 메뉴 이름으로 가져온 레시피를 저장
      */

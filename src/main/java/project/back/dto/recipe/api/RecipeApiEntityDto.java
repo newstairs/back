@@ -3,7 +3,7 @@ package project.back.dto.recipe.api;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import project.back.dto.recipe.RecipeManualDto;
+import project.back.dto.recipe.ManualReqDto;
 import project.back.dto.recipe.RecipePartsDto;
 import project.back.entity.recipe.Recipe;
 
@@ -15,11 +15,11 @@ public class RecipeApiEntityDto {
     private String recipeName;
     private String recipeType;
     private String recipeTip;
-    private List<RecipeManualDto> recipeManualList;
+    private List<ManualReqDto> recipeManualList;
     private List<RecipePartsDto> recipePartsList;
 
     @Builder
-    public RecipeApiEntityDto(String recipeName, String recipeType, String recipeTip, List<RecipeManualDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
+    public RecipeApiEntityDto(String recipeName, String recipeType, String recipeTip, List<ManualReqDto> recipeManualList, List<RecipePartsDto> recipePartsList) {
         this.recipeName = recipeName;
         this.recipeType = recipeType;
         this.recipeTip = recipeTip;
@@ -27,7 +27,7 @@ public class RecipeApiEntityDto {
         this.recipePartsList = recipePartsList;
     }
 
-    public static RecipeApiEntityDto toEntityDto(Recipe recipe, List<RecipeManualDto> manualList, List<RecipePartsDto> partsList) {
+    public static RecipeApiEntityDto toEntityDto(Recipe recipe, List<ManualReqDto> manualList, List<RecipePartsDto> partsList) {
         return RecipeApiEntityDto.builder()
                 .recipeName(recipe.getRecipeName())
                 .recipeType(recipe.getRecipeType())

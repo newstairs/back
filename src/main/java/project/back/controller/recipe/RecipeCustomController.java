@@ -4,11 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.recipe.RecipeRequestDto;
 import project.back.dto.recipe.RecipeResponseDto;
@@ -28,11 +26,23 @@ public class RecipeCustomController {
      */
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<RecipeResponseDto>> createRecipe(
+            @LoginUser Long memberId,
             @RequestParam("recipeData") String recipeData,
             @RequestParam("files") List<MultipartFile> files
     ) throws JsonProcessingException {
         RecipeRequestDto requestDto = new ObjectMapper().readValue(recipeData, RecipeRequestDto.class);
-        ApiResponse<RecipeResponseDto> response = customService.createRecipe(requestDto, files);
+        ApiResponse<RecipeResponseDto> response = customService.createRecipe(memberId, requestDto, files);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 해당 레시피의 작성자가 레시피 삭제
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse> deleteRecipe(
+            @LoginUser Long memberId,
+            @RequestParam Long recipeId
+    ) {
+        return ResponseEntity.ok(customService.deleteRecipe(memberId, recipeId));
     }
 }

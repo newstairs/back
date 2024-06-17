@@ -7,20 +7,23 @@ import project.back.entity.recipe.RecipeManual;
 
 @Data
 @NoArgsConstructor
-public class RecipeManualDto {
+public class ManualResDto {
+    private Long manualId;
     private int step;
     private String manualContent;
     private String manualImgUrl;
 
     @Builder
-    public RecipeManualDto(int step, String manualContent, String manualImgUrl) {
+    public ManualResDto(Long manualId, int step, String manualContent, String manualImgUrl) {
+        this.manualId = manualId;
         this.step = step;
         this.manualContent = manualContent;
         this.manualImgUrl = manualImgUrl;
     }
 
-    public static RecipeManualDto manualDto(RecipeManual manual) {
-        return RecipeManualDto.builder()
+    public static ManualResDto manualResDto(RecipeManual manual) {
+        return ManualResDto.builder()
+                .manualId(manual.getManualId())
                 .step(Math.toIntExact(manual.getStep()))
                 .manualContent(manual.getManualContent())
                 .manualImgUrl(manual.getManualImgUrl())

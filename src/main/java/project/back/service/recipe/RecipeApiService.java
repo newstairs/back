@@ -3,7 +3,7 @@ package project.back.service.recipe;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.back.configuration.WebClientConfig;
-import project.back.dto.recipe.RecipeManualDto;
+import project.back.dto.recipe.ManualReqDto;
 import project.back.dto.recipe.RecipePartsDto;
 import project.back.dto.recipe.api.RecipeApiEntityDto;
 import project.back.dto.recipe.api.RecipeApiProcessingDto;
@@ -99,7 +99,7 @@ public class RecipeApiService {
     /**
      * 레시피 API 매뉴얼 목록 저장
      */
-    private void saveApiManuals(List<RecipeManualDto> manuals, Recipe savedRecipe) {
+    private void saveApiManuals(List<ManualReqDto> manuals, Recipe savedRecipe) {
         manuals.forEach(manualDto -> {
             RecipeManual manual = RecipeManual.builder()
                     .step((long) manualDto.getStep())
@@ -153,10 +153,10 @@ public class RecipeApiService {
     /**
      * 해당 레시피의 메뉴얼 목록을 찾음
      */
-    private List<RecipeManualDto> findManualsByRecipe(Recipe recipe) {
+    private List<ManualReqDto> findManualsByRecipe(Recipe recipe) {
         List<RecipeManual> manuals = manualRepository.findByRecipeRecipeId(recipe.getRecipeId());
         return manuals.stream()
-                .map(RecipeManualDto::manualDto)
+                .map(ManualReqDto::manualReqDto)
                 .toList();
     }
 
