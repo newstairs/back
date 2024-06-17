@@ -74,11 +74,30 @@ public class RecipeCustomService {
      * @param memberId 해당 레시피 작성자 고유번호
      * @param recipeId 해당 레시피 고유번호
      * @return 성공했다는 메시지 반환
+     * @throws RuntimeException 이미지 파일 처리 중 오류 발생
      */
     public ApiResponse deleteRecipe(Long memberId, Long recipeId) {
         Recipe findRecipe = verifyRecipeAuthor(memberId, recipeId);
+        List<RecipeManual> findManuals = getManuals(recipeId);
+        findManuals.forEach(manual -> {
+            String fileName = manual.getManualImgUrl();
+            try {
+                fileService.deleteFile(fileName);
+            } catch (IOException e) {
+                throw new RuntimeException(RecipeMessage.ERROR_RECIPE_IMG_PROCESSING.getMessage(), e);
+            }
+        });
+
         recipeRepository.delete(findRecipe);
         return ApiResponse.success(null, RecipeMessage.SUCCESS_DELETE.getMessage());
+    }
+
+    /**
+     * 해당 레시피의 메뉴얼을 가져옴
+     */
+    private List<RecipeManual> getManuals(Long recipeId) {
+        return manualRepository.findAllByRecipeRecipeId(recipeId)
+                .orElse(null);
     }
 
     /**
