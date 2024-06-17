@@ -138,10 +138,10 @@ public class LoginController {
                         "\"%s\",\"ios_execution_params\":\"%s\"}}," +
                         "\"buttons\":[{\"title\":\"%s\",\"link\":{\"web_url\":\"%s\"," +
                         "\"mobile_web_url\":\"%s\"}}],\"address\":" +
-                        "\"%s\",\"address_title\":\"%s\"}","카카오 판교오피스","판교오피스","https://mud-kage.kakao.com/dn/drTdbB/bWYf06POFPf/owUHIt7K7NoGD0hrzFLeW0/kakaolink40_original.png",800,800,
+                        "\"%s\",\"address_title\":\"%s\"+\"text\":\"%s\"}","카카오 판교오피스","판교오피스","https://mud-kage.kakao.com/dn/drTdbB/bWYf06POFPf/owUHIt7K7NoGD0hrzFLeW0/kakaolink40_original.png",800,800,
                         "https://developers.kakao.com","https://developers.kakao.com/mobile","platform=android","platform=ios",
                         "웹으로 보기","https://developers.kakao.com","https://developers.kakao.com/mobile",
-                        "경기 성남시 분당구 판교역로 235 에이치스퀘어 N동 7층","카카오 판교오피스");
+                        "경기 성남시 분당구 판교역로 235 에이치스퀘어 N동 7층","카카오 판교오피스","zzzzz");
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("template_object", templateObject);
