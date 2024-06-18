@@ -125,23 +125,13 @@ public class LoginController {
         Long id=jwtUtill.getidfromtoken(token);
         List<String> friend_uuid=friendDataDto.getFriend_uuid();
         List<Item> item_list=friendDataDto.getItem_list();
+        String mart_Address=friendDataDto.getMart_address();
         String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
-        /*String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"%s\"," +
+        String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"%s\"," +
                 "\"link\":" +
                 "{\"web_url\":\"https://developers.kakao.com\"," +
-                "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"바로 확인\"}",item_list.toString());*/
-        String templateObject = String.format("{\"object_type\":\"location\"," +
-                        "\"content\":{\"title\":\"%s\"," +
-                        "\"description\":\"%s\",\"image_url\":\"%s\"," +
-                        "\"image_width\":%d,\"image_height\":%d,\"link\":" +
-                        "{\"web_url\":\"%s\",\"mobile_web_url\":\"%s\",\"android_execution_params\":" +
-                        "\"%s\",\"ios_execution_params\":\"%s\"}}," +
-                        "\"buttons\":[{\"title\":\"%s\",\"link\":{\"web_url\":\"%s\"," +
-                        "\"mobile_web_url\":\"%s\"}}],\"address\":" +
-                        "\"%s\",\"address_title\":\"%s\"+\"text\":\"%s\"}","카카오 판교오피스","판교오피스","https://mud-kage.kakao.com/dn/drTdbB/bWYf06POFPf/owUHIt7K7NoGD0hrzFLeW0/kakaolink40_original.png",800,800,
-                        "https://developers.kakao.com","https://developers.kakao.com/mobile","platform=android","platform=ios",
-                        "웹으로 보기","https://developers.kakao.com","https://developers.kakao.com/mobile",
-                        "경기 성남시 분당구 판교역로 235 에이치스퀘어 N동 7층","카카오 판교오피스","zzzzz");
+                "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"%s\"}",item_list.toString(),mart_Address);
+
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("template_object", templateObject);
