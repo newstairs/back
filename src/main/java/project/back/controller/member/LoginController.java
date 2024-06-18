@@ -123,14 +123,15 @@ public class LoginController {
         ObjectMapper objectMapper=new ObjectMapper();
         String token=req.getHeader("Authorization").substring(7);
         Long id=jwtUtill.getidfromtoken(token);
+        Long mart_id=friendDataDto.getMart_id();
         List<String> friend_uuid=friendDataDto.getFriend_uuid();
         List<Item> item_list=friendDataDto.getItem_list();
         String mart_Address=friendDataDto.getMart_address();
         String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
         String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"%s\"," +
                 "\"link\":" +
-                "{\"web_url\":\"https://developers.kakao.com\"," +
-                "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"%s\"}",item_list.toString(),mart_Address);
+                "{\"web_url\":\"http://localhost:3000/friend/%s/%d\"," +
+                "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"%s\"}",item_list.toString(),mart_Address,mart_id,"성공");
 
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
