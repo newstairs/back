@@ -25,9 +25,7 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        ApiResponse<List<ProductDto>> productList =
-                productService.findAllProductDtos(page, size);
-        return ResponseEntity.ok(productList);
+        return ResponseEntity.ok(productService.findAllProductDtos(page, size));
     }
 
     /**
@@ -38,7 +36,6 @@ public class ProductController {
      */
     @GetMapping("/{productName}")
     public ResponseEntity<ApiResponse<List<ProductSearchDto>>> findAllByProductName(@PathVariable String productName) {
-
         return ResponseEntity.ok(productService.findAllByProductName(productName));
     }
 }

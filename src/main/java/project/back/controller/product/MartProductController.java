@@ -28,9 +28,7 @@ public class MartProductController {
     public ResponseEntity<ApiResponse<Map<Long, Long>>> getMartsForCart(
             @LoginUser Long memberId
     ) {
-        ApiResponse<Map<Long, Long>> productTotalPrices =
-                martProductService.findMartsByProductIds(memberId);
-        return ResponseEntity.ok(productTotalPrices);
+        return ResponseEntity.ok(martProductService.findMartsByProductIds(memberId));
     }
 
     /**
@@ -41,8 +39,6 @@ public class MartProductController {
             @PathVariable("martId") Long martId,
             @LoginUser Long memberId
     ) {
-        ApiResponse<List<DiscountInfoDto>> martInfo =
-                martProductService.findMartInfoByMartId(martId, memberId);
-        return ResponseEntity.ok(martInfo);
+        return ResponseEntity.ok(martProductService.findMartInfoByMartId(martId, memberId));
     }
 }
