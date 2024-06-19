@@ -11,13 +11,15 @@ import project.back.dto.review.ReviewDto;
 import project.back.entity.review.Review;
 import project.back.service.review.ReviewService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
-    //리뷰 + 평점 조회 get
+    // 리뷰 + 평점 조회 get
     @GetMapping("/{martId}")
     public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
                                                                   @RequestParam(defaultValue = "0") int page) {
@@ -28,6 +30,7 @@ public class ReviewController {
         }
         return ResponseEntity.ok(new ApiResponse<>(true, "Reviews join successfully", reviews));
     }
+
 
     //리뷰 + 평점 작성 post
     @PostMapping("/")

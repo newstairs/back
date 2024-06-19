@@ -48,8 +48,8 @@ dependencies {
 	// macOS
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.109.Final:osx-aarch_64'
 
-	// flyway
-	implementation 'org.flywaydb:flyway-mysql'
+//	// flyway
+//	implementation 'org.flywaydb:flyway-mysql'
 }
 
 tasks.named('test') {
