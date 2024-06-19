@@ -128,6 +128,7 @@ public class LoginController {
         List<Item> item_list=friendDataDto.getItem_list();
         String mart_Address=friendDataDto.getMart_address();
         String kakao_token=(String) redisTemplate.opsForValue().get(String.format("member_kakao_token_%d",id));
+
         String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"장바구니 요청이왔어요! 확인해주세요!\"," +
                 "\"link\":" +
                 "{\"web_url\":\"http://localhost:3000/friend/%s/%d/%s\"," +
@@ -135,8 +136,9 @@ public class LoginController {
 
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("receiver_uuids",objectMapper.writeValueAsString(friend_uuid));
         formData.add("template_object", templateObject);
-        String x=webClient.mutate()
+        /*String x=webClient.mutate()
                 .baseUrl("https://kapi.kakao.com/v2/api/talk/memo/default/send")
                 .defaultHeader("Content-Type","application/x-www-form-urlencoded")
                 .defaultHeader("Authorization",String.format("Bearer %s",kakao_token))
@@ -145,7 +147,18 @@ public class LoginController {
                 .body(BodyInserters.fromFormData(formData))
                 .retrieve()
                 .bodyToMono(String.class)
+                .block();*/
+        String x=webClient.mutate()
+                .baseUrl("https://kapi.kakao.com/v1/api/talk/friends/message/default/send")
+                .defaultHeader("Content-Type","application/x-www-form-urlencoded")
+                .defaultHeader("Authorization",String.format("Bearer %s",kakao_token))
+                .build()
+                .post()
+                .body(BodyInserters.fromFormData(formData))
+                .retrieve()
+                .bodyToMono(String.class)
                 .block();
+
 
         return new ResponseEntity<>(ApiResponse.success(kakao_token,"성공!"),HttpStatus.OK);
 
