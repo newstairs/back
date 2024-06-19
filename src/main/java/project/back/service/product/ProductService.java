@@ -1,5 +1,6 @@
 package project.back.service.product;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ public class ProductService {
      * @throws RuntimeException        이미지 파일 처리 중 오류 발생
      * @throws NoContentFoundException 상품 목록이 비어있을 때 발생
      */
+    @Transactional
     public ApiResponse<List<ProductDto>> findAllProductDtos(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("productId").ascending());
 
@@ -48,11 +50,11 @@ public class ProductService {
      *
      * @param productName 상품이름(String)
      * @return 상품이름을 포함하는 상품들(과 이미지)
-     * @throws NoContentFoundException productName 을 포함하는 상품이 없는경우
+     * @throws NoContentFoundException productName 을 포함하는 상품이 없는 경우
      */
+    @Transactional
     public ApiResponse<List<ProductSearchDto>> findAllByProductName(String productName) {
         List<Product> products = productRepository.findAllByProductNameContaining(productName);
-
         validateProducts(productName, products);
 
         List<ProductSearchDto> ProductSearchDtos = products.stream()

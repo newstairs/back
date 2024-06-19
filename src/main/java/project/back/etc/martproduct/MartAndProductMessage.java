@@ -14,10 +14,11 @@ public enum MartAndProductMessage {
      */
     NOT_FOUND_MEMBER("사용자 정보를 찾을 수 없습니다."),
     NOT_FOUND_MART_DETAILS("해당 마트에 대한 정보를 찾을 수 없습니다."),
-    NOT_FOUND_PRODUCT_IMG("이미지를 찾을 수 없습니다."),
+    EMPTY_MART_DETAILS("마트 정보가 비어있습니다."),
     EMPTY_CART("장바구니가 비어있습니다."),
     EMPTY_CART_PRODUCTS("장바구니 상품목록이 비어있습니다."),
     EMPTY_PRODUCT_LIST("상품목록이 비어있습니다."),
+    ERROR_SAVE_MART("마트 정보 저장 중 오류가 발생했습니다."),
     ERROR_PRODUCT_IMG_PROCESSING("이미지 파일 처리 중 오류가 발생했습니다.");
 
     private final String message;

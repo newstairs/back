@@ -26,8 +26,7 @@ public class MartController {
     public ResponseEntity<ApiResponse<List<MartResDto>>> saveMarts(
             @LoginUser Long memberId,
             @RequestBody List<MartReqDto> martDto
-    ) {
-        ApiResponse<List<MartResDto>> response = martService.saveMart(martDto);
-        return ResponseEntity.ok(response);
+    ) throws Exception {
+        return ResponseEntity.ok(martService.saveMart(martDto));
     }
 }
