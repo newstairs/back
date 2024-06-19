@@ -183,6 +183,7 @@ CREATE TABLE `review` (
                           `member_id` bigint DEFAULT NULL,
                           `review_id` bigint NOT NULL AUTO_INCREMENT,
                           `review_content` varchar(255) DEFAULT NULL,
+                          `review_title` varchar(255) DEFAULT NULL,
                           PRIMARY KEY (`review_id`),
                           KEY `FKkcal4uuj4v7ue8ouaxwxfe8b8` (`mart_id`),
                           KEY `FKk0ccx5i4ci2wd70vegug074w1` (`member_id`),
