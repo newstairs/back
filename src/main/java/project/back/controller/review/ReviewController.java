@@ -19,6 +19,7 @@ import java.util.List;
 public class ReviewController {
     private final ReviewService reviewService;
 
+
     // 리뷰 + 평점 조회 get
     @GetMapping("/{martId}")
     public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
@@ -49,7 +50,7 @@ public class ReviewController {
     //리뷰 + 평점 수정 patch
     @PatchMapping("/{reviewId}")
     public ResponseEntity<ApiResponse<ReviewDto>> updateReview(@PathVariable Long reviewId, @RequestBody ReviewDto reviewDto) {
-        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto.getReviewContent(), reviewDto.getScore());
+        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto.getReviewContent(), reviewDto.getScore(),reviewDto.getReviewTitle());
         return ResponseEntity.ok(new ApiResponse<>(true, "Review updated successfully", updatedReview));
     }
 }

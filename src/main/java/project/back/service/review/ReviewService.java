@@ -15,8 +15,6 @@ import project.back.repository.member.MemberRepository;
 import project.back.repository.review.ReviewRepository;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Transactional
@@ -27,13 +25,14 @@ public class ReviewService {
     private final MartRepository martRepository;
 
     //review 조회 서비스 + page처리
-    public org.springframework.data.domain.Page<ReviewDto> getReviewByMartId(Long martId, Pageable pageable) {
+    public Page<ReviewDto> getReviewByMartId(Long martId, Pageable pageable) {
         Page<Review> reviews = reviewRepository.findByMart_Id(martId, pageable);
         return reviews.map(review -> ReviewDto.builder()
                 .reviewId(review.getReviewId())
                 .reviewContent(review.getReviewContent())
                 .memberName(review.getMember().getName())
                 .score(review.getScore())
+                .reviewTitle(review.getReviewTitle())
                 .build());
     }
 
@@ -54,6 +53,7 @@ public class ReviewService {
                 .score(reviewDto.getScore())
                 .member(member)
                 .mart(mart)
+                .reviewTitle(reviewDto.getReviewTitle())
                 .build();
 
         return reviewRepository.save(review);
@@ -67,7 +67,7 @@ public class ReviewService {
     }
 
     //리뷰 + 평점 수정하기 서비스
-    public ReviewDto updateReview(Long reviewId, String content, BigDecimal score) {
+    public ReviewDto updateReview(Long reviewId, String content, BigDecimal score, String reviewTitle) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("review not find"));
 
@@ -77,12 +77,14 @@ public class ReviewService {
                 .score(score != null ? score : review.getScore())
                 .member(review.getMember())
                 .mart(review.getMart())
+                .reviewTitle(reviewTitle)
                 .build();
 
         Review savedReview = reviewRepository.save(updatedReview);
         return ReviewDto.builder()
                 .score(savedReview.getScore())
                 .reviewContent(savedReview.getReviewContent())
+                .reviewTitle(savedReview.getReviewTitle())
                 .build();
     }
 }
