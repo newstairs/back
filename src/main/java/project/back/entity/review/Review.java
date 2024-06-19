@@ -21,6 +21,9 @@ public class Review {
     @Column(name = "review_content")
     private String reviewContent;
 
+    @Column(name = "review_title")
+    private String reviewTitle;
+
     @Column(name = "score", precision = 2, scale = 1, nullable = false)
     private BigDecimal score;
 
@@ -34,9 +37,11 @@ public class Review {
 
 
     @Builder
-    public Review(Long reviewId,String reviewContent, BigDecimal score, Member member, Mart mart) {
+
+    public Review(Long reviewId, String reviewContent, String reviewTitle, BigDecimal score, Member member, Mart mart) {
         this.reviewId = reviewId;
         this.reviewContent = reviewContent;
+        this.reviewTitle = reviewTitle;
         this.score = score;
         this.member = member;
         this.mart = mart;
