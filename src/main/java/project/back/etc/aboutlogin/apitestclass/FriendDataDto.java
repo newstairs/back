@@ -11,5 +11,6 @@ public class FriendDataDto {
     private String mart_address;
     private List<String> friend_uuid;
     private List<Item> item_list;
+    private String martname;
 
 }
