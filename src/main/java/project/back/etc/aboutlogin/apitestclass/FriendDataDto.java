@@ -7,9 +7,10 @@ import java.util.List;
 
 @Data
 public class FriendDataDto {
-
-
+    private Long mart_id;
+    private String mart_address;
     private List<String> friend_uuid;
     private List<Item> item_list;
+    private String martname;
 
 }
