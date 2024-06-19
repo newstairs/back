@@ -7,7 +7,8 @@ spring:
         registration:
           kakao:
             client-id: ENC(SgyhNpimVFEoQv9a5MChlCiao3nJgYEjGxB/3KAtTlhYxEeZdrD3PzJ0Io2vnrLS)
-            redirect-uri: http://localhost:3000/login/oauth2/callback/kakao
+            redirect-uri: https://6671380d076d5cc646d94ccb--sprightly-semolina-ab844a.netlify.app/oauth2/callback/kakao
+            #http://localhost:3000/login/oauth2/callback/kakao
             #${cloud.host.url}/login/oauth2/callback/kakao
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
