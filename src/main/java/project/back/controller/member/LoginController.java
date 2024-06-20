@@ -133,7 +133,7 @@ public class LoginController {
 
         String templateObject = String.format("{\"object_type\":\"text\",\"text\":\"장바구니 요청이왔어요! 확인해주세요!\"," +
                 "\"link\":" +
-                "{\"web_url\":\"http://localhost:3000/friend/%s/%d/%s\"," +
+                "{\"web_url\":\"https://ssagemeogja.netlify.app/friend/%s/%d/%s\"," +
                 "\"mobile_web_url\":\"https://developers.kakao.com\"},\"button_title\":\"%s\"}",mart_Address,mart_id,friendDataDto.getMartname(),"자세히보기");
 
 
