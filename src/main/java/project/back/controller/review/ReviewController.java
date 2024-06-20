@@ -1,7 +1,6 @@
 package project.back.controller.review;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,20 +11,19 @@ import project.back.dto.review.ReviewDto;
 import project.back.entity.review.Review;
 import project.back.service.review.ReviewService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
-@Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
 
-    //리뷰 + 평점 조회 get
+
+    // 리뷰 + 평점 조회 get
     @GetMapping("/{martId}")
     public ResponseEntity<ApiResponse<Page<ReviewDto>>> getReview(@PathVariable Long martId,
                                                                   @RequestParam(defaultValue = "0") int page) {
-
-
-        log.info("여기까지 도달햇나????:{} {}",martId,page);
         Pageable pageable = PageRequest.of(page, 8);
         Page<ReviewDto> reviews = reviewService.getReviewByMartId(martId, pageable);
         if (reviews.isEmpty()) {
@@ -33,6 +31,7 @@ public class ReviewController {
         }
         return ResponseEntity.ok(new ApiResponse<>(true, "Reviews join successfully", reviews));
     }
+
 
     //리뷰 + 평점 작성 post
     @PostMapping("/")
@@ -51,7 +50,7 @@ public class ReviewController {
     //리뷰 + 평점 수정 patch
     @PatchMapping("/{reviewId}")
     public ResponseEntity<ApiResponse<ReviewDto>> updateReview(@PathVariable Long reviewId, @RequestBody ReviewDto reviewDto) {
-        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto.getReviewContent(), reviewDto.getScore());
+        ReviewDto updatedReview = reviewService.updateReview(reviewId, reviewDto.getReviewContent(), reviewDto.getScore(),reviewDto.getReviewTitle());
         return ResponseEntity.ok(new ApiResponse<>(true, "Review updated successfully", updatedReview));
     }
 }

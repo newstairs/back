@@ -13,16 +13,18 @@ public class ReviewDto {
     private String reviewContent;
     private BigDecimal score;
     private String memberName;
-    private Long memberId; // 리뷰를 작성한 회원의 ID
-    private Long martId; // 리뷰 대상인 마트의 ID
-
+    private Long memberId;
+    private Long martId;
+    private String reviewTitle;
     @Builder
-    public ReviewDto(Long reviewId, String reviewContent, BigDecimal score, String memberName, Long memberId, Long martId) {
+
+    public ReviewDto(Long reviewId, String reviewContent, BigDecimal score, String memberName, Long memberId, Long martId, String reviewTitle) {
         this.reviewId = reviewId;
         this.reviewContent = reviewContent;
         this.score = score;
         this.memberName = memberName;
         this.memberId = memberId;
         this.martId = martId;
+        this.reviewTitle = reviewTitle;
     }
 }
