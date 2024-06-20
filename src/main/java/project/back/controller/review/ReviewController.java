@@ -40,11 +40,9 @@ public class ReviewController {
 
     //리뷰 + 평점 작성 post
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
-
-        log.info("review:{},{},{},{},{}",reviewDto.getReviewTitle(),reviewDto.getMartId(),reviewDto.getReviewContent(),reviewDto.getScore(),memberId);
-        Review review = reviewService.writeReview(reviewDto,memberId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
+    public ResponseEntity<ApiResponse<ReviewDto>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
+        ReviewDto newReviewDto = reviewService.writeReview(reviewDto,memberId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", newReviewDto));
     }
 
     //리뷰 + 평점 삭제 delete

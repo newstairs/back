@@ -37,7 +37,7 @@ public class ReviewService {
     }
 
     //review + 평점 작성하기 서비스
-    public Review writeReview(ReviewDto reviewDto, Long memberId) {
+    public ReviewDto writeReview(ReviewDto reviewDto, Long memberId) {
         // 필수 필드 검증
         if (reviewDto.getMartId() == null || reviewDto.getReviewContent() == null || reviewDto.getScore() == null || reviewDto.getReviewTitle() == null) {
             throw new IllegalArgumentException("요청 필드가 누락되었습니다.");
@@ -55,8 +55,14 @@ public class ReviewService {
                 .mart(mart)
                 .reviewTitle(reviewDto.getReviewTitle())
                 .build();
+        Review newReviewDto = reviewRepository.save(review);
 
-        return reviewRepository.save(review);
+        return ReviewDto.builder()
+                .reviewId(newReviewDto.getReviewId())
+                .score(newReviewDto.getScore())
+                .reviewContent(newReviewDto.getReviewContent())
+                .reviewTitle(newReviewDto.getReviewTitle())
+                .build();
     }
 
     //리뷰 + 평점 삭제하기 서비스
