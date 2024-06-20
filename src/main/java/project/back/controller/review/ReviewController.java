@@ -2,6 +2,7 @@ package project.back.controller.review;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reviews")
+@Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
 
@@ -40,6 +42,8 @@ public class ReviewController {
     @PostMapping("/")
 
     public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
+
+        log.info("review:",reviewDto,memberId);
         Review review = reviewService.writeReview(reviewDto,memberId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
     }
