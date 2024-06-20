@@ -42,7 +42,7 @@ public class ReviewController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
 
-        log.info("review:",reviewDto,memberId);
+        log.info("review:{},{}",reviewDto,memberId);
         Review review = reviewService.writeReview(reviewDto,memberId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
     }
