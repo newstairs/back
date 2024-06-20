@@ -39,7 +39,7 @@ public class ReviewService {
     //review + 평점 작성하기 서비스
     public Review writeReview(ReviewDto reviewDto, Long memberId) {
         // 필수 필드 검증
-        if (reviewDto.getMemberId() == null || reviewDto.getMartId() == null || reviewDto.getReviewContent() == null || reviewDto.getScore() == null || reviewDto.getReviewTitle() == null) {
+        if (reviewDto.getMartId() == null || reviewDto.getReviewContent() == null || reviewDto.getScore() == null || reviewDto.getReviewTitle() == null) {
             throw new IllegalArgumentException("요청 필드가 누락되었습니다.");
         }
         Member member = memberRepository.findById(memberId)
