@@ -84,7 +84,7 @@ public class MemberService {
         System.out.println("header = " + header);
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("Authorization", header);
-        log.info("hello");
+
         String userdata=webClient.mutate()
                 .defaultHeader("Authorization",header)
                 .baseUrl(userinfouri)
@@ -93,7 +93,7 @@ public class MemberService {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
-
+        log.info("userdata:",userdata);
         JSONObject profile=(JSONObject) jsonParser.parse(userdata);
 
         JSONObject properties = (JSONObject) profile.get("properties");

@@ -68,6 +68,8 @@ public class LoginController {
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
         String code=access_code.getAccess_code();
+
+        log.info("access_code:",access_code);
         MultiValueMap<String, String> accessTokenParam = accessTokenParams("authorization_code",kakaoclientid,code,kakakoredirecturi);
         List<Object>tokendata=memberService.TryLogin(accessTokenParam);
 
