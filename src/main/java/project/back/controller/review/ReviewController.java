@@ -1,11 +1,14 @@
 package project.back.controller.review;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.back.configuration.annotation.LoginUser;
 import project.back.dto.ApiResponse;
 import project.back.dto.review.ReviewDto;
 import project.back.entity.review.Review;
@@ -35,8 +38,9 @@ public class ReviewController {
 
     //리뷰 + 평점 작성 post
     @PostMapping("/")
-    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto) {
-        Review review = reviewService.writeReview(reviewDto);
+
+    public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
+        Review review = reviewService.writeReview(reviewDto,memberId);
         return ResponseEntity.ok(new ApiResponse<>(true, "Review created successfully", review));
     }
 
