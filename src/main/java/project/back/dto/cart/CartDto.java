@@ -7,6 +7,9 @@ import project.back.entity.cart.Cart;
 @Data
 @Builder
 public class CartDto {
+
+    private static final String IMAGE_URL_START = "/images";
+
     private Long productId;
     private String productName;
     private String productImgUrl;
@@ -16,7 +19,7 @@ public class CartDto {
         return CartDto.builder()
                 .productId(cart.getProduct().getProductId())
                 .productName(cart.getProduct().getProductName())
-                .productImgUrl(cart.getProduct().getProductImgUrl())
+                .productImgUrl(IMAGE_URL_START+cart.getProduct().getProductImgUrl())
                 .quantity(cart.getQuantity())
                 .build();
     }
