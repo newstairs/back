@@ -39,7 +39,7 @@ public class ReviewController {
 
 
     //리뷰 + 평점 작성 post
-    @PostMapping("")
+    @PostMapping("/add")
     public ResponseEntity<ApiResponse<Review>> writeReview(@RequestBody ReviewDto reviewDto, @LoginUser Long memberId) {
 
         log.info("review:",reviewDto,memberId);
