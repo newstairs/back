@@ -24,6 +24,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import project.back.dto.ApiResponse;
 import project.back.dto.member.MemberDto;
+import project.back.dto.member.MemberDto2;
+import project.back.dto.member.MemberDtoOriginLogin;
 import project.back.entity.member.Member;
 import project.back.etc.aboutlogin.*;
 import project.back.etc.aboutlogin.apitestclass.FriendDataDto;
@@ -64,6 +66,31 @@ public class LoginController {
 
 
 
+
+    @PostMapping("/reqsave")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> mebmersave(@RequestBody MemberDto memberDto){
+        memberService.OriginMemberSave(memberDto);
+        return new ResponseEntity<>( ApiResponse.success("success","회원가입성공"), HttpStatus.OK);
+    }
+
+    @PostMapping("/reqlogin2")
+    @ResponseBody
+    public ResponseEntity<ApiResponse<String>> logins2(@RequestBody MemberDtoOriginLogin memberDtoOriginLogin) throws IOException {
+
+
+        List<Object>tokendata=memberService.OriginTryLogin(memberDtoOriginLogin);
+
+        return new ResponseEntity<>( ApiResponse.success((String)tokendata.get(0),"로그인 성공"), HttpStatus.OK);
+
+    }
+
+
+
+
+
+
+
     @PostMapping("/reqlogin")
     @ResponseBody
     public ResponseEntity<ApiResponse<String>> logins(@RequestBody Access_code access_code) throws ParseException, IOException {
@@ -75,6 +102,9 @@ public class LoginController {
 
         return new ResponseEntity<>( ApiResponse.success((String)tokendata.get(0),"로그인 성공"), HttpStatus.OK);
     }
+
+
+
 
 
     public MultiValueMap<String, String> accessTokenParams(String grantType, String clientId,String code,String redirect_uri) {

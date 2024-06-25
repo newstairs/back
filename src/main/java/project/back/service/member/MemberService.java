@@ -3,7 +3,6 @@ package project.back.service.member;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -18,6 +17,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import project.back.dto.member.MemberDto2;
+import project.back.dto.member.MemberDtoOriginLogin;
+import project.back.etc.aboutlogin.NoMemberError;
 import project.back.etc.aboutlogin.JwtToken;
 import project.back.etc.aboutlogin.JwtUtill;
 import project.back.dto.member.MemberDto;
@@ -60,12 +62,42 @@ public class MemberService {
         this.memberRepository=memberRepository;
     }
 
-    public Long memebersave(MemberDto member){
+    public Long memebersave(MemberDto2 member){
        return memberRepository.membersave(member);
     }
 
+
+    public void OriginMemberSave(MemberDto memberDto){
+         memberRepository.membersavebyorigin(memberDto);
+    }
+
+
+
+    public List<Object> OriginTryLogin(MemberDtoOriginLogin memberDtoOriginLogin) throws IOException {
+       Optional<Member> m= memberRepository.findbyoriginway2(memberDtoOriginLogin.getEmail(),memberDtoOriginLogin.getPassword());
+
+
+       if(m.isPresent()) {
+           List<Object> tokendata = gettokenandrespons2(m.get().getName(), m);
+
+
+           return tokendata;
+       }
+       else{
+           throw new NoMemberError();
+       }
+
+
+
+
+
+    }
+
+
+
     public  List<Object>  TryLogin(MultiValueMap<String, String> accessTokenParam) throws ParseException, IOException {
         log.info("accesstokenparam:{}",accessTokenParam);
+
         String AnwserFromApi=webClient
                 .mutate()
                 .baseUrl(tokenuri)
@@ -160,7 +192,7 @@ public class MemberService {
             return obj;
         }
         else{
-            Long id=memebersave(new MemberDto(email,username));
+            Long id=memebersave(new MemberDto2(email,username));
 
             JwtToken jwtToken=jwtUtill.genjwt(username,id);
 
@@ -170,5 +202,21 @@ public class MemberService {
 
             return obj;
         }
+    }
+    public List<Object> gettokenandrespons2(String username, Optional<Member> member) throws IOException {
+
+        ObjectMapper objectMapper=new ObjectMapper();
+
+        Member m=member.get();
+
+        JwtToken jwtToken=jwtUtill.genjwt(username,m.getMemberId());
+
+        List<Object> obj=new ArrayList<>();
+        obj.add(jwtToken.getAccesstoken());
+        obj.add(m.getMemberId());
+
+        return obj;
+
+
     }
 }
