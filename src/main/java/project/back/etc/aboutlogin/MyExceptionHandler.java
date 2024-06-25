@@ -80,6 +80,20 @@ public class MyExceptionHandler {
 
     }
 
+    @ResponseBody
+    @ExceptionHandler(IdExistError.class)
+    public ResponseEntity<ApiResponse<String>> idexist(Exception e){
+        return new ResponseEntity<>(ApiResponse.fail("이미 존재하는 아이디입니다."),HttpStatus.BAD_REQUEST);
+    }
+
+
+
+    @ResponseBody
+    @ExceptionHandler(NoMemberError.class)
+    public ResponseEntity<ApiResponse<String>> nomember(Exception e){
+        return new ResponseEntity<>(ApiResponse.fail("존재하지않는 유저입니다."),HttpStatus.BAD_REQUEST);
+    }
+
     public String resolvetoken(HttpServletRequest req){
         String token=req.getHeader("Authorization");
         if(StringUtils.hasText(token) &&token.startsWith("Bearer")){

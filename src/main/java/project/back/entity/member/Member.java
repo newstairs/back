@@ -19,16 +19,21 @@ public class Member extends UpdateCreateTime {
     private String email;
 
 
-    @Column(name="name")
+    @Column(name="name",nullable = true)
     private String name;
+
+
+    @Column(name="password",nullable = true)
+    private String password;
 
 
     @Column(name="address")
     private String address;
 
-    public Member(String email, String name) {
+    public Member(String email, String password) {
         this.email = email;
-        this.name = name;
+        this.password = password;
 
     }
+
 }
